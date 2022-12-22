@@ -19,7 +19,7 @@ export class Record {
   @Column()
   message: string;
 
-  @Column()
+  @Column({ type: 'float' })
   value: number;
 
   @CreateDateColumn()
