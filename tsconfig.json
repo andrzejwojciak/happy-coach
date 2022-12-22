@@ -1,5 +1,8 @@
 {
   "compilerOptions": {
+    "experimentalDecorators": true,
+    "strictPropertyInitialization": false,
+    "emitDecoratorMetadata": true,
     "target": "es2015" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
     "lib": ["es6"],
     "module": "es2020",

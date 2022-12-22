@@ -6,4 +6,12 @@ class SlackBotConfig {
   static appToken: string | undefined = process.env.APP_TOKEN;
 }
 
-export { SlackBotConfig };
+class PostgresConfig {
+  static host: string | undefined = process.env.DB_HOST;
+  static port: string | undefined = process.env.DB_PORT;
+  static username: string | undefined = process.env.DB_USERNAME;
+  static password: string | undefined = process.env.DB_PASSWORD;
+  static database: string | undefined = process.env.DB_DBNAME;
+}
+
+export { SlackBotConfig, PostgresConfig };
