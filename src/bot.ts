@@ -28,20 +28,21 @@ const prepareMessage = (
   }, 0);
   const initial = currentSum - recordsSum;
 
-  let message = `${initial}${unit}`;
+  let message = `${initial.toFixed(2)}${unit}`;
 
   newRecords.forEach((record) => {
-    message += ' + ' + record + unit;
+    message += ' + ' + record.toFixed(2) + unit;
   });
 
-  message += ` = ${currentSum}${unit}`;
+  message += ` = ${currentSum.toFixed(2)}${unit}`;
 
   return message;
 };
 
 app.message(
-  new RegExp('\\+[0-9][0-9]{0,2}(?:[.,][0-9]{1,3})?(h|km)', 'm'),
+  new RegExp('\\+[0-9][0-9]{0,2}(?:[.,][0-9]{0,2})?(h|km)', 'm'),
   async ({ message, say }) => {
+    console.log(message);
     const distance = recordService.getSumFromMessage(getText(message), 'km');
     const time = recordService.getSumFromMessage(getText(message), 'h');
     const userId = getName(message);
