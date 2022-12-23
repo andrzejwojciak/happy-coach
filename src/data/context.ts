@@ -6,7 +6,7 @@ import { PostgresConfig } from '../config.js';
 const AppDataSource = new DataSource({
   type: 'postgres',
   host: PostgresConfig.host,
-  port: 49153,
+  port: Number(PostgresConfig.port),
   username: PostgresConfig.username,
   password: PostgresConfig.password,
   database: PostgresConfig.database,
