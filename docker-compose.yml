@@ -1,0 +1,23 @@
+version: '3'
+services:
+  happy_coach:
+    container_name: happy_coach
+    restart: always
+    build: .
+    depends_on:
+      - db
+
+  db:
+    container_name: postgres
+    image: postgres:15-alpine
+    ports:
+      - '5432:${DB_PORT}'
+    volumes:
+      - data:/data/db
+    environment:
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_DBNAME}
+
+volumes:
+  data: {}
