@@ -77,13 +77,28 @@ app.message(
   }
 );
 
-app.message('stats', async ({ message, say }) => {
+app.message(
+  new RegExp(/^stats (distance|time) [2-9][0-9]{3}$/),
+  async ({ message, say }) => {
+    const text = getText(message);
+    const year = text.match(/[2-9][0-9]{3}/);
+    const activity = text.match(/(distance|time)/);
+
+    const usersRecords = await recordService.getUsersRecord(
+      Number(year![0]),
+      activity![0]
+    );
+    const replyMessage = usersRecords ? usersRecords : 'nothing here';
+
+    await say(replyMessage);
+  }
+);
+
+app.message(new RegExp(/^stats$/), async ({ message, say }) => {
   const timeValues = await recordService.getCurrentValues('time');
   const distanceValue = await recordService.getCurrentValues('distance');
 
-  await say(
-    `Time: ${timeValues.toFixed(2)}, distance: ${distanceValue.toFixed(2)}`
-  );
+  await say(`Time: ${timeValues}, distance: ${distanceValue}`);
 });
 
 const startBot: Promise<void> = (async () => {
