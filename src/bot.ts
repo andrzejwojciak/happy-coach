@@ -34,7 +34,7 @@ const prepareMessage = (
     message += ' + ' + record.toFixed(2) + unit;
   });
 
-  message += ` = ${currentSum.toFixed(2)}${unit}`;
+  message += ` = ${currentSum}${unit}`;
 
   return message;
 };
