@@ -46,8 +46,4 @@ const saveRecord = async (
   console.log('user record saved, id: ' + record.id);
 };
 
-export {
-  saveRecord,
-  getCurrentValues,
-  getNumbersFromMessage as getSumFromMessage,
-};
+export { saveRecord, getCurrentValues, getNumbersFromMessage };

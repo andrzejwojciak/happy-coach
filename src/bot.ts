@@ -40,20 +40,26 @@ const prepareMessage = (
 };
 
 app.message(
-  new RegExp('\\+[0-9][0-9]{0,2}(?:[.,][0-9]{0,2})?(h|km)', 'm'),
+  new RegExp('\\+[0-9][0-9]{0,2}(?:[.,][0-9]{0,2})?(h|km|min)', 'm'),
   async ({ message, say }) => {
     console.log(message);
-    const distance = recordService.getSumFromMessage(getText(message), 'km');
-    const time = recordService.getSumFromMessage(getText(message), 'h');
+    const distance = recordService.getNumbersFromMessage(
+      getText(message),
+      'km'
+    );
+    const hours = recordService.getNumbersFromMessage(getText(message), 'h');
+    recordService
+      .getNumbersFromMessage(getText(message), 'min')
+      .forEach((minute) => hours.push(minute / 60));
     const userId = getName(message);
     const serializedMessage = JSON.stringify(message);
 
     let responseMessage: string = '';
 
-    if (time.length) {
-      await recordService.saveRecord(userId, serializedMessage, 'time', time);
+    if (hours.length) {
+      await recordService.saveRecord(userId, serializedMessage, 'time', hours);
       const sum = await recordService.getCurrentValues('time');
-      responseMessage += prepareMessage(time, sum, 'h');
+      responseMessage += prepareMessage(hours, sum, 'h');
     }
 
     if (distance.length) {
@@ -75,7 +81,9 @@ app.message('stats', async ({ message, say }) => {
   const timeValues = await recordService.getCurrentValues('time');
   const distanceValue = await recordService.getCurrentValues('distance');
 
-  await say(`Time: ${timeValues}, distance: ${distanceValue}`);
+  await say(
+    `Time: ${timeValues.toFixed(2)}, distance: ${distanceValue.toFixed(2)}`
+  );
 });
 
 const startBot: Promise<void> = (async () => {
