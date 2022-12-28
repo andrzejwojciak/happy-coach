@@ -12,12 +12,6 @@ const app = new App({
   port: 3000,
 });
 
-const getName = (message: pkg.KnownEventFromType<'message'>) =>
-  (message as { user: string }).user;
-
-const getText = (message: pkg.KnownEventFromType<'message'>) =>
-  (message as { text: string }).text;
-
 const prepareMessage = (
   newRecords: number[],
   currentSum: number,
@@ -42,16 +36,13 @@ const prepareMessage = (
 app.message(
   new RegExp('\\+[0-9][0-9]{0,2}(?:[.,][0-9]{0,2})?(h|km|min)', 'm'),
   async ({ message, say }) => {
-    console.log(message);
-    const distance = recordService.getNumbersFromMessage(
-      getText(message),
-      'km'
-    );
-    const hours = recordService.getNumbersFromMessage(getText(message), 'h');
+    const mess = message as Message;
+    const distance = recordService.getNumbersFromMessage(mess.text, 'km');
+    const hours = recordService.getNumbersFromMessage(mess.text, 'h');
     recordService
-      .getNumbersFromMessage(getText(message), 'min')
+      .getNumbersFromMessage(mess.text, 'min')
       .forEach((minute) => hours.push(minute / 60));
-    const userId = getName(message);
+    const userId = mess.user;
     const serializedMessage = JSON.stringify(message);
 
     let responseMessage: string = '';
@@ -73,14 +64,19 @@ app.message(
       responseMessage += '\n' + prepareMessage(distance, sum, 'km');
     }
 
-    await say(responseMessage);
+    await say({
+      text: responseMessage,
+      thread_ts: mess.thread_ts,
+      reply_broadcast: mess.thread_ts != null,
+    });
   }
 );
 
 app.message(
   new RegExp(/^stats (distance|time) [2-9][0-9]{3}$/),
   async ({ message, say }) => {
-    const text = getText(message);
+    const mess = message as Message;
+    const text = mess.text;
     const year = text.match(/[2-9][0-9]{3}/);
     const activity = text.match(/(distance|time)/);
 
@@ -105,5 +101,19 @@ const startBot: Promise<void> = (async () => {
   await app.start();
   console.log('⚡️ Bolt app is running!');
 })();
+
+declare type Message = {
+  user: string;
+  text: string;
+  type: string;
+  subtype: string;
+  event_ts: string;
+  ts: string;
+  root: string;
+  client_msg_id: string;
+  channel: string;
+  channel_type: string;
+  thread_ts: string;
+};
 
 export { startBot };
