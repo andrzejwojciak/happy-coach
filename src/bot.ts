@@ -12,57 +12,17 @@ const app = new App({
   port: 3000,
 });
 
-const prepareMessage = (
-  newRecords: number[],
-  currentSum: number,
-  unit: string
-): string => {
-  const recordsSum = newRecords.reduce((accumulator, current) => {
-    return accumulator + current;
-  }, 0);
-  const initial = currentSum - recordsSum;
-
-  let message = `${initial.toFixed(2)}${unit}`;
-
-  newRecords.forEach((record) => {
-    message += ' + ' + record.toFixed(2) + unit;
-  });
-
-  message += ` = ${currentSum}${unit}`;
-
-  return message;
-};
-
 app.message(
-  new RegExp('\\+[0-9][0-9]{0,2}(?:[.,][0-9]{0,2})?(h|km|min)', 'm'),
+  new RegExp('\\+[0-9][0-9]{0,2}(?:[.][0-9]{0,2})?(h|km|min)', 'm'),
   async ({ message, say }) => {
     const mess = message as Message;
-    const distance = recordService.getNumbersFromMessage(mess.text, 'km');
-    const hours = recordService.getNumbersFromMessage(mess.text, 'h');
-    recordService
-      .getNumbersFromMessage(mess.text, 'min')
-      .forEach((minute) => hours.push(minute / 60));
-    const userId = mess.user;
-    const serializedMessage = JSON.stringify(message);
+    if (mess.bot_id) return;
 
-    let responseMessage: string = '';
-
-    if (hours.length) {
-      await recordService.saveRecord(userId, serializedMessage, 'time', hours);
-      const sum = await recordService.getCurrentValues('time');
-      responseMessage += prepareMessage(hours, sum, 'h');
-    }
-
-    if (distance.length) {
-      await recordService.saveRecord(
-        userId,
-        serializedMessage,
-        'distance',
-        distance
-      );
-      const sum = await recordService.getCurrentValues('distance');
-      responseMessage += '\n' + prepareMessage(distance, sum, 'km');
-    }
+    const responseMessage = await recordService.addRecords(
+      JSON.stringify(message),
+      mess.text,
+      mess.user
+    );
 
     await say({
       text: responseMessage,
@@ -97,10 +57,95 @@ app.message(new RegExp(/^stats$/), async ({ message, say }) => {
   await say(`Time: ${timeValues}, distance: ${distanceValue}`);
 });
 
+app.message(
+  new RegExp('\\+[0-9][0-9]{0,2}(?:[.][0-9]{0,2})?m(?!i)', 'm'),
+  async ({ message, say }) => {
+    const mess = message as Message;
+    let metersValue = '';
+    let minutesValue = '';
+    const numbers = recordService.getNumbersFromMessage(mess.text, 'm');
+
+    numbers.forEach((number) => {
+      metersValue += `+${number / 1000}km `;
+      minutesValue += `+${number}min `;
+    });
+
+    await say({
+      text: "Sorry, I cannot handle the 'm' unit, please choose which one you would like to use instead",
+      thread_ts: mess.ts,
+      blocks: [
+        {
+          type: 'section',
+          text: {
+            type: 'plain_text',
+            text: "Sorry, I cannot handle the 'm' unit, please choose which one you would like to use instead:",
+          },
+        },
+        {
+          type: 'actions',
+          elements: [
+            {
+              type: 'button',
+              text: {
+                type: 'plain_text',
+                text: 'Meters',
+              },
+              value: metersValue,
+              action_id: 'unsported_unit-meter',
+            },
+            {
+              type: 'button',
+              text: {
+                type: 'plain_text',
+                text: 'Minutes',
+              },
+              value: minutesValue,
+              action_id: 'unsported_unit-minute',
+            },
+          ],
+        },
+      ],
+    });
+  }
+);
+
+app.action(
+  new RegExp(/^(unsported_unit-minute|unsported_unit-meter)$/),
+  async ({ action, body, client, ack, say }) => {
+    const message = (body as unknown as Body).message;
+    const typedAction = action as Action;
+
+    const response = await recordService.addRecords(
+      JSON.stringify(message),
+      typedAction.value,
+      message.user
+    );
+
+    await ack();
+    await say({
+      text: response,
+      thread_ts: message.thread_ts,
+      reply_broadcast: message.thread_ts != null,
+    });
+  }
+);
+
 const startBot: Promise<void> = (async () => {
   await app.start();
   console.log('⚡️ Bolt app is running!');
 })();
+
+declare type Action = {
+  action_id: string;
+  block_id: string;
+  value: string;
+  type: string;
+  action_ts: string;
+};
+
+declare type Body = {
+  message: Message;
+};
 
 declare type Message = {
   user: string;
@@ -114,6 +159,7 @@ declare type Message = {
   channel: string;
   channel_type: string;
   thread_ts: string;
+  bot_id: string;
 };
 
 export { startBot };
