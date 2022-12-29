@@ -102,7 +102,7 @@ app.message(
     changes =
       '*v1.0.2 (29.12.2022)*: \n\n• Added commands: changelog, version, help \n';
     changes +=
-      "\n*v1.0.1 (28.12.2022)*: \n\n• Added handling for unit 'm' in the add value command \n• Fixed NaN issue while adding value with ',', handling for ',' removed \n• Added replies for threads ";
+      "\n*v1.0.1 (28.12.2022)*: \n\n• Added handling for unit 'm' in the add value command \n• Fixed NaN issue while adding value with ','. Handling for ',' removed \n• Added replies for threads ";
     say({ text: changes });
   }
 );
