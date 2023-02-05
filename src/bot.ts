@@ -13,7 +13,7 @@ const app = new App({
 });
 
 app.message(
-  new RegExp('\\+[0-9][0-9]{0,2}(?:[.][0-9]{0,2})?(h|km|min)', 'm'),
+  new RegExp('\\+[0-9][0-9]{0,2}(?:[.,][0-9]{0,2})?(h|km|min)', 'm'),
   async ({ message, say }) => {
     const mess = message as Message;
     if (mess.bot_id) return;
@@ -64,17 +64,17 @@ app.message(new RegExp(/^help$/), async ({ message, say }) => {
   const mess = message as Message;
   if (mess.thread_ts) return;
 
-  let commands = '• help - you have just used it\n';
+  let commands = '• help - displays available commands\n';
   commands +=
-    '• +{value}{h|km|min} - will add and calculate the values. Can be placed multiple times anywhere in the message, can also be used in threads (eg. +10km)\n';
+    '• +{value}{h|km|min} - adds and calculates the values. Can be placed multiple times anywhere in the message, can also be used in threads (eg. +10km)\n';
   commands +=
-    '• stats - will display the distance and time over all time, can be used in the main chat\n';
+    '• stats - displays the distance and time over all time, can be used in the main chat\n';
   commands +=
-    '• stats (distance|time) {year} - will display the distance or time for a given year, can be used in the main chat (eg. stats distance 2022)\n';
+    '• stats (distance|time) {year} - displays the distance or time for a given year, can be used in the main chat (eg. stats distance 2022)\n';
   commands +=
-    '• HappyCoach (-v|version) - will display version of the application, can be used in main chat.\n';
+    '• HappyCoach (-v|version) - displays version of the application, can be used in main chat.\n';
   commands +=
-    '• HappyCoach changelog - will display changes to the application version, and can be used in the main chat.\n';
+    '• HappyCoach changelog - displays changes to the application version, and can be used in the main chat.\n';
 
   say({
     text: commands,
@@ -87,7 +87,7 @@ app.message(
     const mess = message as Message;
     if (mess.thread_ts) return;
 
-    const version = '*HappyCoach®* v1.0.2\n\nWith <3 from Legnica';
+    const version = '*HappyCoach®* v1.0.3\n\nWith <3';
     say({ text: version });
   }
 );
@@ -99,7 +99,8 @@ app.message(
     if (mess.thread_ts) return;
 
     let changes: string;
-    changes =
+    changes = "*v1.0.3 (05.02.2022)*: \n\n• Restored ',' in add command \n";
+    changes +=
       '*v1.0.2 (29.12.2022)*: \n\n• Added commands: changelog, version, help \n';
     changes +=
       "\n*v1.0.1 (28.12.2022)*: \n\n• Added handling for unit 'm' in the add value command \n• Fixed NaN issue while adding value with ','. Handling for ',' removed \n• Added replies for threads ";

@@ -51,12 +51,13 @@ const addRecords = async (
 };
 
 const getNumbersFromMessage = (message: string, unit: string): number[] => {
-  const regex = new RegExp(`\\+[0-9][0-9]{0,2}(?:[.][0-9]{0,2})?${unit}`, 'g');
+  const regex = new RegExp(`\\+[0-9][0-9]{0,2}(?:[.,][0-9]{0,2})?${unit}`, 'g');
   const matches = message.match(regex);
 
   let numbers: number[] = [];
 
   matches?.forEach((match) => {
+    match = match.replace(',', '.');
     const foundNumber = match.match(/[0-9]\d{0,2}(?:[.][0-9]{0,2})?/);
 
     if (foundNumber) numbers.push(Number(foundNumber[0]));
