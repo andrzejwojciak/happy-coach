@@ -41,7 +41,7 @@ app.message(
     const year = text.match(/[2-9][0-9]{3}/);
     const activity = text.match(/(distance|time)/);
 
-    const usersRecords = await recordService.getUsersRecord(
+    const usersRecords = await recordService.getUsersRecordByYear(
       Number(year![0]),
       activity![0]
     );
@@ -50,6 +50,17 @@ app.message(
     await say(replyMessage);
   }
 );
+
+app.message(new RegExp(/^stats (distance|time)$/), async ({ message, say }) => {
+  const mess = message as Message;
+  if (mess.thread_ts) return;
+  const text = mess.text;
+  const activity = text.match(/(distance|time)/);
+
+  const usersRecords = await recordService.getUsersRecord(activity![0]);
+  const replyMessage = usersRecords ? usersRecords : 'nothing here';
+  await say(replyMessage);
+});
 
 app.message(new RegExp(/^stats$/), async ({ message, say }) => {
   const mess = message as Message;
@@ -70,7 +81,7 @@ app.message(new RegExp(/^help$/), async ({ message, say }) => {
   commands +=
     '• stats - displays the distance and time over all time, can be used in the main chat\n';
   commands +=
-    '• stats (distance|time) {year} - displays the distance or time for a given year, can be used in the main chat (eg. stats distance 2022)\n';
+    '• stats (distance|time) {year} - displays the distance or time for optional given year, can be used in the main chat (eg. stats distance, stats time 2022)\n';
   commands +=
     '• HappyCoach (-v|version) - displays version of the application, can be used in main chat.\n';
   commands +=
@@ -87,7 +98,7 @@ app.message(
     const mess = message as Message;
     if (mess.thread_ts) return;
 
-    const version = '*HappyCoach®* v1.0.3\n\nWith <3';
+    const version = '*HappyCoach®* v1.0.4\n\nWith <3';
     say({ text: version });
   }
 );
@@ -99,9 +110,10 @@ app.message(
     if (mess.thread_ts) return;
 
     let changes: string;
-    changes = "*v1.0.3 (05.02.2022)*: \n\n• Restored ',' in add command \n";
+    changes = '*v1.0.4 (09.02.2022)*: \n\n• Added all-time stats \n';
+    changes += "\n*v1.0.3 (05.02.2022)*: \n\n• Restored ',' in add command \n";
     changes +=
-      '*v1.0.2 (29.12.2022)*: \n\n• Added commands: changelog, version, help \n';
+      '\n*v1.0.2 (29.12.2022)*: \n\n• Added commands: changelog, version, help \n';
     changes +=
       "\n*v1.0.1 (28.12.2022)*: \n\n• Added handling for unit 'm' in the add value command \n• Fixed NaN issue while adding value with ','. Handling for ',' removed \n• Added replies for threads ";
     say({ text: changes });
