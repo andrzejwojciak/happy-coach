@@ -5,13 +5,13 @@ import { PostgresConfig } from '../config.js';
 
 const AppDataSource = new DataSource({
   type: 'postgres',
-  host: PostgresConfig.host,
-  port: Number(PostgresConfig.port),
-  username: PostgresConfig.username,
-  password: PostgresConfig.password,
-  database: PostgresConfig.database,
-  entities: [Record],
-  synchronize: true,
+  host: 'localhost',
+  port: 32768,
+  username: 'postgres',
+  password: 'postgrespw',
+  database: 'postgres2',
+  entities: ['src/data/entities/**/*.ts"'],
+  migrations: ['src/data/migrations/**/*.ts"'],
   logging: false,
 });
 
