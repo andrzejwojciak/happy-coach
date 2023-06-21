@@ -136,7 +136,9 @@ export class EventService {
     await AppDataSource.manager.save(event);
     console.log('event saved, id: ' + event.id);
 
-    return { text: 'event created' };
+    return {
+      text: `Event ${createEventModel.name} stared! Good luck everyone! :crossed_fingers::skin-tone-2:`,
+    };
   }
 
   public async GetEventAsync(channelId: string): Promise<Event | null> {
