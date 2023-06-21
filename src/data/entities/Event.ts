@@ -11,7 +11,7 @@ export class Event {
   id: number;
 
   @Column()
-  channel: string;
+  channelId: string;
 
   @Column()
   eventName: string;
@@ -21,4 +21,13 @@ export class Event {
 
   @Column()
   ends_at: Date;
+
+  @Column()
+  pointsForKilometre: number;
+
+  @Column()
+  pointsForHour: number;
+
+  @Column()
+  totalPointsToScore: number;
 }

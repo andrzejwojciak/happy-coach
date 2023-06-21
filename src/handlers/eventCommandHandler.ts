@@ -1,23 +1,98 @@
 import { Message } from '../slack/types/message.js';
 import { AbstractHandler } from './handler.js';
 import { HandleResult } from '../slack/types/handleResult.js';
+import { EventService } from '../services/eventService.js';
+import { CreateEventDetails } from '../services/models/createEventModel.js';
+import { Event } from '../data/entities/Event.js';
 
 export default class EventCommandHandler extends AbstractHandler {
-  public async handle(request: Message): Promise<HandleResult | null> {
-    //TODO: Check if any event is assigned to channel
-    //IF not super.handle(request)
+  private eventService: EventService;
+  private event: Event;
 
+  public async handle(request: Message): Promise<HandleResult | null> {
     console.log('EventCommandHandler executed');
 
+    this.eventService = new EventService();
+    const event = await this.eventService.GetEventAsync(request.channel);
+
+    if (!event) {
+      if (request.text.startsWith('create event'))
+        return await this.createEventAsync(request);
+
+      console.log('no event found for channel ' + request.channel);
+      return super.handle(request);
+    } else {
+      this.event = event;
+    }
+
     switch (true) {
-      case request.text === 'event1':
-        return { text: 'event1 command called' };
+      case new RegExp(
+        '\\+[0-9][0-9]{0,2}(?:[.,][0-9]{0,2})?(h|km|min)',
+        'm'
+      ).test(request.text):
+        return await this.addEntires(request);
       case request.text === 'event2':
         return { text: 'event2 command called' };
       default:
-        //TODO: Return null if event is applied for channel and command didn't match to anything
-        console.log('Passing request to the next handler');
-        return super.handle(request);
+        console.log('Command for event not found');
+        return null;
     }
+  }
+  private async addEntires(request: Message): Promise<HandleResult | null> {
+    const result = await this.eventService.addRecordsAsync(
+      JSON.stringify(request),
+      request.text,
+      request.user,
+      this.event
+    );
+
+    return {
+      text: result,
+      thread_ts: request.thread_ts,
+      reply_broadcast: request.thread_ts != null,
+    };
+  }
+
+  private async createEventAsync(
+    request: Message
+  ): Promise<HandleResult | null> {
+    const eventDetails = this.createDictionary(request.text.split('\n'));
+    const eventDetailsModel = this.assingToCreateEventModel(
+      eventDetails,
+      request.channel
+    );
+    return await this.eventService.CreateEventAsync(eventDetailsModel);
+  }
+
+  private createDictionary(list: string[]): Record<string, string> {
+    const dictionary: Record<string, string> = {};
+
+    for (const item of list) {
+      const index = item.indexOf(':');
+      if (index !== -1) {
+        const key = item.substring(0, index).trim();
+        const value = item.substring(index + 1).trim();
+        dictionary[key] = value;
+      }
+    }
+
+    return dictionary;
+  }
+
+  private assingToCreateEventModel(
+    dictionary: Record<string, any>,
+    channelId: string
+  ): CreateEventDetails {
+    const event: CreateEventDetails = {
+      starts: dictionary['starts'],
+      endsAt: dictionary['ends at'],
+      name: dictionary['name'],
+      pointsForKilometre: dictionary['points for kilometre'],
+      pointsForHour: dictionary['points for hour'],
+      totalPointsToScore: dictionary['total points to score'],
+      channelId: channelId,
+    };
+
+    return event;
   }
 }

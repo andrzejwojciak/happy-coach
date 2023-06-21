@@ -3,6 +3,7 @@ import { DataSource } from 'typeorm';
 import { Record } from './entities/Record.js';
 import { Event } from './entities/Event.js';
 import { PostgresConfig } from '../config.js';
+import { EventRecords } from './entities/EventRecords.js';
 
 const AppDataSource = new DataSource({
   type: 'postgres',
@@ -11,7 +12,7 @@ const AppDataSource = new DataSource({
   username: PostgresConfig.username,
   password: PostgresConfig.password,
   database: PostgresConfig.database,
-  entities: [Record, Event],
+  entities: [Record, Event, EventRecords],
   synchronize: true,
   logging: false,
 });
