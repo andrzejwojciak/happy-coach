@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import { Record } from './entities/Record.js';
+import { Event } from './entities/Event.js';
 import { PostgresConfig } from '../config.js';
 
 const AppDataSource = new DataSource({
@@ -10,7 +11,7 @@ const AppDataSource = new DataSource({
   username: PostgresConfig.username,
   password: PostgresConfig.password,
   database: PostgresConfig.database,
-  entities: [Record],
+  entities: [Record, Event],
   synchronize: true,
   logging: false,
 });
