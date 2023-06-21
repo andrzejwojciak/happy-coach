@@ -1,20 +1,22 @@
-import { SayArguments, SayFn } from '@slack/bolt';
 import { Message } from '../slack/types/message.js';
 import { AbstractHandler } from './handler.js';
 import { HandleResult } from '../slack/types/handleResult.js';
 
 export default class BasicCommandsHandler extends AbstractHandler {
   public async handle(request: Message): Promise<HandleResult | null> {
+    console.log('BasicCommandsHandler executed');
+
     switch (true) {
       case new RegExp(/^help$/).test(request.text):
-        this.helpCommand(request);
+        return this.helpCommand(request);
       case new RegExp(/^(happycoach|HappyCoach|Coach) (version|-v)$/).test(
         request.text
       ):
-        this.versionCommand(request);
+        return this.versionCommand(request);
       case request.text === 'ping':
-        this.pongCommand(request);
+        return this.pongCommand(request);
       default:
+        console.log('Passing request to the next handler');
         return super.handle(request);
     }
   }

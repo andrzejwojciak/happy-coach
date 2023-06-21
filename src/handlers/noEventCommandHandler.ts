@@ -6,6 +6,7 @@ import { RecordService } from '../services/recordService.js';
 export default class NoEventCommandHandler extends AbstractHandler {
   public async handle(request: Message): Promise<HandleResult | null> {
     if (request.bot_id) return super.handle(request);
+    console.log('NoEventCommandHandler executed');
 
     switch (true) {
       case new RegExp(
@@ -22,6 +23,7 @@ export default class NoEventCommandHandler extends AbstractHandler {
       case new RegExp(/^stats$/).test(request.text):
         return await this.checkStats(request);
       default:
+        console.log('Passing request to the next handler');
         return super.handle(request);
     }
   }
