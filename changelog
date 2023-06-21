@@ -1,0 +1,6 @@
+changes = '*v1.0.4 (09.02.2022)*: \n\n• Added all-time stats \n';
+changes += "\n*v1.0.3 (05.02.2022)*: \n\n• Restored ',' in add command \n";
+changes +=
+  '\n*v1.0.2 (29.12.2022)*: \n\n• Added commands: changelog, version, help \n';
+changes +=
+  "\n*v1.0.1 (28.12.2022)*: \n\n• Added handling for unit 'm' in the add value command \n• Fixed NaN issue while adding value with ','. Handling for ',' removed \n• Added replies for threads ";
