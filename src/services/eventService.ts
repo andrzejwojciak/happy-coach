@@ -120,7 +120,7 @@ export class EventService {
     console.log('event saved, id: ' + event.id);
 
     return {
-      text: `Event ${createEventModel.name} stared! Good luck everyone! :crossed_fingers::skin-tone-2:`,
+      text: `Event ${createEventModel.name} started! Good luck everyone! :crossed_fingers::skin-tone-2:`,
     };
   }
 
