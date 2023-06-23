@@ -7,8 +7,6 @@ import { HandleResult } from '../slack/types/handleResult.js';
 import { RecordService } from './recordService.js';
 
 export class EventService {
-  private currentSum: number = 0;
-
   public async addRecordsAsync(
     logMessage: string,
     message: string,
@@ -50,45 +48,30 @@ export class EventService {
       );
     }
 
-    let pointsScored: number = await this.getTotalScore(event);
-    responseMessage += `\ntotal score:  ${this.currentSum + pointsScored}/${
-      event.totalPointsToScore
-    } points`;
+    const pointsScored: number = await this.getTotalScore(event);
+    responseMessage += `\ntotal score:  ${pointsScored}/${event.totalPointsToScore} points`;
 
     return responseMessage;
   }
 
   private async getTotalScore(event: Event): Promise<number> {
-    const eventRecordRepository = AppDataSource.getRepository(EventRecords);
     const recordRepository = AppDataSource.getRepository(Record);
 
-    const eventRecords = await eventRecordRepository
-      .createQueryBuilder('event_records')
-      .where('event_records.eventId = :id', { id: event.id })
-      .select('event_records.recordId')
-      .getRawMany();
+    const query = `select SUM(value), activity from record where id in (select event_records."recordId" from event_records where event_records."eventId" = ${event.id}) group by activity`;
 
-    if (eventRecords.length === 0) return 0;
+    const result = (await recordRepository.query(query)) as ResultItem[];
 
-    const values = eventRecords.map((result) => Object.values(result)[0]);
+    const distanceSum =
+      result.find((row) => row.activity === 'distance')?.sum || 0;
 
-    const query = await recordRepository
-      .createQueryBuilder('record')
-      .where('record.id IN (:...ids)', { ids: values })
-      .select('record.value, record.activity')
-      .getRawMany();
+    const timeSum = result.find((row) => row.activity === 'time')?.sum || 0;
 
-    let sumOfDistance = 0;
-    let sumOfTime = 0;
+    const totalPoints = (
+      distanceSum * event.pointsForKilometre +
+      timeSum * event.pointsForHour
+    ).toFixed(0);
 
-    query.forEach((record) => {
-      if (record.activity == 'time') sumOfTime += record.value;
-      if (record.activity == 'distance') sumOfDistance += record.value;
-    });
-
-    return (
-      sumOfDistance * event.pointsForKilometre + sumOfTime * event.pointsForHour
-    );
+    return Number(totalPoints);
   }
 
   private async saveRecordAsync(
@@ -175,7 +158,6 @@ export class EventService {
       }
     });
 
-    this.currentSum += currentSum * pointsForUnit;
     message += ` = ${(currentSum * pointsForUnit).toFixed(
       0
     )} points for ${unit}\n`;
@@ -183,3 +165,8 @@ export class EventService {
     return message;
   }
 }
+
+type ResultItem = {
+  sum: number;
+  activity: string;
+};
