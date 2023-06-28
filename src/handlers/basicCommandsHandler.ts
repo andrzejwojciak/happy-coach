@@ -23,18 +23,18 @@ export default class BasicCommandsHandler extends AbstractHandler {
 
   private helpCommand(request: Message): HandleResult | null {
     if (request.thread_ts) return null;
-
-    let commands = '• help - displays available commands\n';
-    commands +=
-      '• +{value}{h|km|min} - adds and calculates the values. Can be placed multiple times anywhere in the message, can also be used in threads (eg. +10km)\n';
-    commands +=
-      '• stats - displays the distance and time over all time, can be used in the main chat\n';
-    commands +=
-      '• stats (distance|time) {year} - displays the distance or time for optional given year, can be used in the main chat (eg. stats distance, stats time 2022)\n';
-    commands +=
-      '• HappyCoach (-v|version) - displays version of the application, can be used in main chat.\n';
-    commands +=
-      '• HappyCoach changelog - displays changes to the application version, and can be used in the main chat.\n';
+    const commands = 'WIP';
+    // let commands = '• help - displays available commands\n';
+    // commands +=
+    //   '• +{value}{h|km|min} - adds and calculates the values. Can be placed multiple times anywhere in the message, can also be used in threads (eg. +10km)\n';
+    // commands +=
+    //   '• stats - displays the distance and time over all time, can be used in the main chat\n';
+    // commands +=
+    //   '• stats (distance|time) {year} - displays the distance or time for optional given year, can be used in the main chat (eg. stats distance, stats time 2022)\n';
+    // commands +=
+    //   '• HappyCoach (-v|version) - displays version of the application, can be used in main chat.\n';
+    // commands +=
+    //   '• HappyCoach changelog - displays changes to the application version, and can be used in the main chat.\n';
 
     return { text: commands };
   }
@@ -42,7 +42,7 @@ export default class BasicCommandsHandler extends AbstractHandler {
   private versionCommand(request: Message): HandleResult | null {
     if (request.thread_ts) return null;
 
-    const version = '*HappyCoach®* v2.0.0\n\nWith <3';
+    const version = '*HappyCoach®* v2.0.1\n\nWith <3';
     return { text: version };
   }
 

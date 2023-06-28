@@ -4,6 +4,7 @@ import { HandleResult } from '../slack/types/handleResult.js';
 import { EventService } from '../services/eventService.js';
 import { CreateEventDetails } from '../services/models/createEventModel.js';
 import { Event } from '../data/entities/Event.js';
+import moment from 'moment';
 
 export default class EventCommandHandler extends AbstractHandler {
   private eventService: EventService;
@@ -26,6 +27,16 @@ export default class EventCommandHandler extends AbstractHandler {
     }
 
     switch (true) {
+      case request.text === 'event status':
+        return {
+          text: `Event ${event.eventName} started at ${moment(
+            event.created_at
+          ).format('DD-MMM-YYYY HH:mm:ss')} ends at ${moment(
+            event.ends_at
+          ).format('DD-MMM-YYYY HH:mm:ss')}. You have to score ${
+            event.totalPointsToScore
+          } points`,
+        };
       case new RegExp(
         '\\+[0-9][0-9]{0,2}(?:[.,][0-9]{0,2})?(h|km|min)',
         'm'

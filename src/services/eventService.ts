@@ -5,6 +5,8 @@ import { AppDataSource } from '../data/context.js';
 import { CreateEventDetails } from './models/createEventModel.js';
 import { HandleResult } from '../slack/types/handleResult.js';
 import { RecordService } from './recordService.js';
+import { MoreThan, Not, Raw } from 'typeorm';
+import { env, eventNames } from 'process';
 
 export class EventService {
   public async addRecordsAsync(
@@ -49,9 +51,24 @@ export class EventService {
     }
 
     const pointsScored: number = await this.getTotalScore(event);
-    responseMessage += `\ntotal score:  ${pointsScored}/${event.totalPointsToScore} points`;
+
+    if (pointsScored >= event.totalPointsToScore)
+      responseMessage = await this.finishEvent(event, pointsScored);
+    else
+      responseMessage += `\ntotal score:  ${pointsScored}/${event.totalPointsToScore} points`;
 
     return responseMessage;
+  }
+
+  private async finishEvent(
+    event: Event,
+    pointsScored: Number
+  ): Promise<string> {
+    const eventRepository = AppDataSource.getRepository(Event);
+    event.finished = true;
+    eventRepository.save(event);
+
+    return `Congratulations on completing the ${event.eventName} event! You scored ${pointsScored} points, finishing before the time ran out. Great job!`;
   }
 
   private async getTotalScore(event: Event): Promise<number> {
@@ -126,9 +143,15 @@ export class EventService {
 
   public async GetEventAsync(channelId: string): Promise<Event | null> {
     const repository = AppDataSource.getRepository(Event);
+    const today = new Date();
     const entity = await repository.findOne({
-      where: { channelId: channelId },
+      where: {
+        channelId: channelId,
+        ends_at: MoreThan(today),
+        finished: false,
+      },
     });
+
     return entity;
   }
 

@@ -30,4 +30,7 @@ export class Event {
 
   @Column()
   totalPointsToScore: number;
+
+  @Column({ default: false })
+  finished: boolean;
 }

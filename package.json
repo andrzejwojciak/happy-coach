@@ -38,6 +38,7 @@
     "@slack/events-api": "3.0.1",
     "axios": "0.26.1",
     "dotenv": "16.0.0",
+    "moment": "2.29.4",
     "pg": "8.8.0",
     "typeorm": "0.3.11"
   }
