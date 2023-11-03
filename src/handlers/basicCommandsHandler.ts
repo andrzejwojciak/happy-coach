@@ -42,7 +42,7 @@ export default class BasicCommandsHandler extends AbstractHandler {
   private versionCommand(request: Message): HandleResult | null {
     if (request.thread_ts) return null;
 
-    const version = '*HappyCoach®* v2.0.1\n\nWith <3';
+    const version = '*HappyCoach®* v2.1.0\n\nWith <3';
     return { text: version };
   }
 

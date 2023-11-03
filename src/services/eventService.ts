@@ -54,8 +54,29 @@ export class EventService {
 
     if (pointsScored >= event.totalPointsToScore)
       responseMessage = await this.finishEvent(event, pointsScored);
-    else
-      responseMessage += `\ntotal score:  ${pointsScored}/${event.totalPointsToScore} points`;
+    else {
+      switch (event.theme) {
+        case 'dogs':
+          const percentScored = Math.trunc(
+            (pointsScored / event.totalPointsToScore) * 100
+          );
+
+          const dogEmoji = ':dog_2:';
+          const loadingBar =
+            '----------------------------------------------------------------------------------------------------';
+
+          let progressBar =
+            loadingBar.slice(0, percentScored - 1) +
+            dogEmoji +
+            loadingBar.slice(percentScored, loadingBar.length);
+
+          responseMessage += `\n:dog-house:${progressBar}:bone: (${percentScored}%)`;
+          responseMessage += `\n${pointsScored}/${event.totalPointsToScore} points`;
+          break;
+        default:
+          responseMessage += `\ntotal score:  ${pointsScored}/${event.totalPointsToScore} points`;
+      }
+    }
 
     return responseMessage;
   }
@@ -128,6 +149,7 @@ export class EventService {
     event.created_at = new Date();
     event.ends_at = new Date(createEventModel.endsAt);
     event.eventName = createEventModel.name;
+    event.theme = createEventModel.theme;
     event.pointsForHour = createEventModel.pointsForHour;
     event.pointsForKilometre = createEventModel.pointsForKilometre;
     event.totalPointsToScore = createEventModel.totalPointsToScore;

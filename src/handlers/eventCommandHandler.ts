@@ -98,6 +98,7 @@ export default class EventCommandHandler extends AbstractHandler {
       starts: dictionary['starts'],
       endsAt: dictionary['ends at'],
       name: dictionary['name'],
+      theme: dictionary['theme'],
       pointsForKilometre: dictionary['points for kilometre'],
       pointsForHour: dictionary['points for hour'],
       totalPointsToScore: dictionary['total points to score'],
