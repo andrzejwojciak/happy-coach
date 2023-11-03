@@ -62,13 +62,13 @@ export class EventService {
           );
 
           const dogEmoji = ':dog_2:';
-          const loadingBar = '--------------------';
+          const loadingBar = '––––––––––––––––––––';
           const percentScoredScaled = Math.trunc(percentScored / 5);
 
           let progressBar =
             loadingBar.slice(
               0,
-              percentScoredScaled - 1 > 0 ? percentScoredScaled : 0
+              percentScoredScaled - 1 > 0 ? percentScoredScaled - 1 : 0
             ) +
             dogEmoji +
             loadingBar.slice(percentScoredScaled, loadingBar.length);
