@@ -57,23 +57,28 @@ export class EventService {
     else {
       switch (event.theme) {
         case 'dogs':
-          const percentScored = Math.trunc(
-            (pointsScored / event.totalPointsToScore) * 100
-          );
+          const percentScored = (pointsScored / event.totalPointsToScore) * 100;
 
           const dogEmoji = ':dog_2:';
-          const loadingBar = '––––––––––––––––––––';
-          const percentScoredScaled = Math.trunc(percentScored / 5);
+          const fieldChar = '–';
+          const totalFieldsToJump = 20;
+
+          let fieldsJumped = Math.trunc(
+            (percentScored / 100) * totalFieldsToJump
+          );
+          let fieldsToJump = totalFieldsToJump - fieldsJumped - 1;
+
+          console.log(fieldsJumped);
+          console.log(fieldsToJump);
 
           let progressBar =
-            loadingBar.slice(
-              0,
-              percentScoredScaled - 1 > 0 ? percentScoredScaled - 1 : 0
-            ) +
+            fieldChar.repeat(fieldsJumped) +
             dogEmoji +
-            loadingBar.slice(percentScoredScaled, loadingBar.length);
+            fieldChar.repeat(fieldsToJump);
 
-          responseMessage += `\n:dog-house:${progressBar}:bone: (${percentScored}%)`;
+          responseMessage += `\n:dog-house:${progressBar}:bone: (${percentScored.toFixed(
+            2
+          )}%)`;
           responseMessage += `\n${pointsScored}/${event.totalPointsToScore} points`;
           break;
         default:
