@@ -1,51 +1,87 @@
 import { Event } from '../data/entities/Event.js';
-import { Record } from '../data/entities/Record.js';
-import { EventRecords } from '../data/entities/EventRecords.js';
-import { AppDataSource } from '../data/context.js';
-import { CreateEventDetails } from './models/createEventModel.js';
 import { HandleResult } from '../slack/types/handleResult.js';
 import { RecordService } from './recordService.js';
-import { MoreThan, Not, Raw } from 'typeorm';
-import { env, eventNames } from 'process';
+import { Unit } from '../enums/unit.js';
+import Repository from '../repositories/repository.js';
+import { CreateEventDetails } from './models/createEventModel.js';
 
 export class EventService {
+  private readonly recordService: RecordService;
+
+  constructor() {
+    this.recordService = new RecordService();
+  }
+
+  public async GetEventAsync(channelId: string): Promise<Event | null> {
+    const event = Repository.GetEventAsync(channelId);
+    return event;
+  }
+
+  public async SaveEventAsync(
+    createEventModel: CreateEventDetails
+  ): Promise<HandleResult | null> {
+    const event = new Event();
+    event.channelId = createEventModel.channelId;
+    event.created_at = new Date();
+    event.ends_at = new Date(createEventModel.endsAt);
+    event.eventName = createEventModel.name;
+    event.pointsForHour = createEventModel.pointsForHour;
+    event.pointsForKilometre = createEventModel.pointsForKilometre;
+    event.totalPointsToScore = createEventModel.totalPointsToScore;
+
+    await Repository.SaveEventAsync(event);
+
+    return {
+      text: `Event ${createEventModel.name} started! Good luck everyone! :crossed_fingers::skin-tone-2:`,
+    };
+  }
+
   public async addRecordsAsync(
     logMessage: string,
     message: string,
     userId: string,
     event: Event
   ): Promise<string> {
-    const recordService = new RecordService();
+    const distances = this.recordService.getNumbersFromMessage(
+      message,
+      Unit.Kilometer
+    );
+    const hours = this.recordService.getNumbersFromMessage(message, Unit.Hour);
 
-    const distance = recordService.getNumbersFromMessage(message, 'km');
-    const hours = recordService.getNumbersFromMessage(message, 'h');
-
-    recordService
-      .getNumbersFromMessage(message, 'min')
+    this.recordService
+      .getNumbersFromMessage(message, Unit.Minute)
       .forEach((minute) => hours.push(minute / 60));
 
     let responseMessage: string = '';
 
     if (hours.length) {
-      await this.saveRecordAsync(userId, logMessage, 'time', hours, event.id);
+      await Repository.saveRecordAsync(
+        userId,
+        logMessage,
+        Unit.Time,
+        hours,
+        event.id
+      );
+
       responseMessage += this.prepareMessage(
         hours,
-        'time',
+        Unit.Time,
         event.pointsForHour
       );
     }
 
-    if (distance.length) {
-      await this.saveRecordAsync(
+    if (distances.length) {
+      await Repository.saveRecordAsync(
         userId,
         logMessage,
-        'distance',
-        distance,
+        Unit.Distance,
+        distances,
         event.id
       );
+
       responseMessage += this.prepareMessage(
-        distance,
-        'distance',
+        distances,
+        Unit.Distance,
         event.pointsForKilometre
       );
     }
@@ -55,34 +91,31 @@ export class EventService {
     if (pointsScored >= event.totalPointsToScore)
       responseMessage = await this.finishEvent(event, pointsScored);
     else {
-      switch (event.theme) {
-        case 'dogs':
-          const percentScored = (pointsScored / event.totalPointsToScore) * 100;
+      if (event.theme_id) {
+        const percentScored = (pointsScored / event.totalPointsToScore) * 100;
 
-          const dogEmoji = ':dog_2:';
-          const fieldChar = '–';
-          const totalFieldsToJump = 20;
+        const start = ':dog-house:'; // TODO: get from event
+        const finish = ':bone:'; // TODO: Get from event
+        const dogEmoji = ':dog_2:'; // Todo: get from event
+        const fieldChar = '–';
+        const totalFieldsToJump = 20;
 
-          let fieldsJumped = Math.trunc(
-            (percentScored / 100) * totalFieldsToJump
-          );
-          let fieldsToJump = totalFieldsToJump - fieldsJumped - 1;
+        let fieldsJumped = Math.trunc(
+          (percentScored / 100) * totalFieldsToJump
+        );
+        let fieldsToJump = totalFieldsToJump - fieldsJumped - 1;
 
-          console.log(fieldsJumped);
-          console.log(fieldsToJump);
+        let progressBar =
+          fieldChar.repeat(fieldsJumped) +
+          dogEmoji +
+          fieldChar.repeat(fieldsToJump);
 
-          let progressBar =
-            fieldChar.repeat(fieldsJumped) +
-            dogEmoji +
-            fieldChar.repeat(fieldsToJump);
-
-          responseMessage += `\n:dog-house:${progressBar}:bone: (${percentScored.toFixed(
-            2
-          )}%)`;
-          responseMessage += `\n${pointsScored}/${event.totalPointsToScore} points`;
-          break;
-        default:
-          responseMessage += `\ntotal score:  ${pointsScored}/${event.totalPointsToScore} points`;
+        responseMessage += `\n${start}${progressBar}${finish} (${percentScored.toFixed(
+          2
+        )}%)`;
+        responseMessage += `\n${pointsScored}/${event.totalPointsToScore} points`;
+      } else {
+        responseMessage += `\ntotal score:  ${pointsScored}/${event.totalPointsToScore} points`;
       }
     }
 
@@ -93,19 +126,15 @@ export class EventService {
     event: Event,
     pointsScored: Number
   ): Promise<string> {
-    const eventRepository = AppDataSource.getRepository(Event);
     event.finished = true;
-    eventRepository.save(event);
+    await Repository.SaveEvent(event);
 
-    return `Congratulations on completing the ${event.eventName} event! You scored ${pointsScored} points, finishing before the time ran out. Great job!`;
+    return `Congratulations on completing the ${event.eventName} event! You scored ${pointsScored} points,
+    finishing before the time ran out. Great job!`;
   }
 
   private async getTotalScore(event: Event): Promise<number> {
-    const recordRepository = AppDataSource.getRepository(Record);
-
-    const query = `select SUM(value), activity from record where id in (select event_records."recordId" from event_records where event_records."eventId" = ${event.id}) group by activity`;
-
-    const result = (await recordRepository.query(query)) as ResultItem[];
+    const result = await Repository.GetTotalScore(event.id);
 
     const distanceSum =
       result.find((row) => row.activity === 'distance')?.sum || 0;
@@ -118,71 +147,6 @@ export class EventService {
     ).toFixed(0);
 
     return Number(totalPoints);
-  }
-
-  private async saveRecordAsync(
-    userId: string,
-    message: string,
-    activity: string,
-    values: number[],
-    eventId: number
-  ) {
-    const record = new Record();
-    const valuesSum = values.reduce((accumulator, current) => {
-      return accumulator + current;
-    }, 0);
-
-    record.message = message;
-    record.userId = userId;
-    record.activity = activity;
-    record.value = Number(valuesSum.toFixed(2));
-
-    await AppDataSource.manager.save(record);
-
-    const eventRecords = new EventRecords();
-
-    eventRecords.eventId = eventId;
-    eventRecords.recordId = record.id;
-
-    await AppDataSource.manager.save(eventRecords);
-  }
-
-  public async CreateEventAsync(
-    createEventModel: CreateEventDetails
-  ): Promise<HandleResult | null> {
-    console.log('Creating event for channel id: ' + createEventModel.channelId);
-    const event = new Event();
-
-    event.channelId = createEventModel.channelId;
-    event.created_at = new Date();
-    event.ends_at = new Date(createEventModel.endsAt);
-    event.eventName = createEventModel.name;
-    event.theme = createEventModel.theme;
-    event.pointsForHour = createEventModel.pointsForHour;
-    event.pointsForKilometre = createEventModel.pointsForKilometre;
-    event.totalPointsToScore = createEventModel.totalPointsToScore;
-
-    console.log(event);
-    await AppDataSource.manager.save(event);
-    console.log('event saved, id: ' + event.id);
-
-    return {
-      text: `Event ${createEventModel.name} started! Good luck everyone! :crossed_fingers::skin-tone-2:`,
-    };
-  }
-
-  public async GetEventAsync(channelId: string): Promise<Event | null> {
-    const repository = AppDataSource.getRepository(Event);
-    const today = new Date();
-    const entity = await repository.findOne({
-      where: {
-        channelId: channelId,
-        ends_at: MoreThan(today),
-        finished: false,
-      },
-    });
-
-    return entity;
   }
 
   private prepareMessage(
@@ -218,8 +182,3 @@ export class EventService {
     return message;
   }
 }
-
-type ResultItem = {
-  sum: number;
-  activity: string;
-};

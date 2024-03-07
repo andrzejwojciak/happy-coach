@@ -28,28 +28,21 @@ export default class EventCommandHandler extends AbstractHandler {
 
     switch (true) {
       case request.text === 'event status':
-        return {
-          text: `Event ${event.eventName} started at ${moment(
-            event.created_at
-          ).format('DD-MMM-YYYY HH:mm:ss')} ends at ${moment(
-            event.ends_at
-          ).format('DD-MMM-YYYY HH:mm:ss')}. You have to score ${
-            event.totalPointsToScore
-          } points`,
-        };
+        return this.getEventStatus();
       case new RegExp(
         '\\+[0-9][0-9]{0,2}(?:[.,][0-9]{0,2})?(h|km|min)',
         'm'
       ).test(request.text):
-        return await this.addEntires(request);
-      case request.text === 'event2':
-        return { text: 'event2 command called' };
+        return await this.addEntiresToEvent(request);
       default:
         console.log('Command for event not found');
         return null;
     }
   }
-  private async addEntires(request: Message): Promise<HandleResult | null> {
+
+  private async addEntiresToEvent(
+    request: Message
+  ): Promise<HandleResult | null> {
     const result = await this.eventService.addRecordsAsync(
       JSON.stringify(request),
       request.text,
@@ -72,7 +65,7 @@ export default class EventCommandHandler extends AbstractHandler {
       eventDetails,
       request.channel
     );
-    return await this.eventService.CreateEventAsync(eventDetailsModel);
+    return await this.eventService.SaveEventAsync(eventDetailsModel);
   }
 
   private createDictionary(list: string[]): Record<string, string> {
@@ -80,6 +73,7 @@ export default class EventCommandHandler extends AbstractHandler {
 
     for (const item of list) {
       const index = item.indexOf(':');
+
       if (index !== -1) {
         const key = item.substring(0, index).trim();
         const value = item.substring(index + 1).trim();
@@ -94,7 +88,7 @@ export default class EventCommandHandler extends AbstractHandler {
     dictionary: Record<string, any>,
     channelId: string
   ): CreateEventDetails {
-    const event: CreateEventDetails = {
+    return {
       starts: dictionary['starts'],
       endsAt: dictionary['ends at'],
       name: dictionary['name'],
@@ -104,7 +98,17 @@ export default class EventCommandHandler extends AbstractHandler {
       totalPointsToScore: dictionary['total points to score'],
       channelId: channelId,
     };
+  }
 
-    return event;
+  getEventStatus(): HandleResult {
+    return {
+      text: `Event ${this.event.eventName} started at ${moment(
+        this.event.created_at
+      ).format('DD-MMM-YYYY HH:mm:ss')} ends at ${moment(
+        this.event.ends_at
+      ).format('DD-MMM-YYYY HH:mm:ss')}. You have to score ${
+        this.event.totalPointsToScore
+      } points`,
+    };
   }
 }

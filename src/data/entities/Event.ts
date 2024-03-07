@@ -14,7 +14,7 @@ export class Event {
   channelId: string;
 
   @Column({ nullable: true })
-  theme: string;
+  theme_id: number;
 
   @Column()
   eventName: string;

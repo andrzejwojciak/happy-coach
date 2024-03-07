@@ -1,24 +1,30 @@
 import {
   Entity,
   Column,
-  PrimaryGeneratedColumn,
   CreateDateColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 
 @Entity()
-export class Record {
+export class Theme {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  userId: string;
+  name: string;
 
   @Column()
-  activity: string;
+  startSymbol: string;
 
-  @Column({ type: 'float' })
-  value: number;
+  @Column()
+  finishSymbol: string;
+
+  @Column()
+  pawn: string;
 
   @CreateDateColumn()
   created_at: Date;
+
+  @Column()
+  created_by: number;
 }

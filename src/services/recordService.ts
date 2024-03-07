@@ -1,5 +1,5 @@
 import { Record } from '../data/entities/Record.js';
-import { AppDataSource } from '../data/context.js';
+import Repository from '../repositories/repository.js';
 
 export class RecordService {
   prepareMessage = (
@@ -71,15 +71,8 @@ export class RecordService {
   };
 
   getCurrentValues = async (activity: string): Promise<number> => {
-    const repo = AppDataSource.getRepository(Record);
-
-    const sum = await repo
-      .createQueryBuilder('record')
-      .select('SUM(record.value)', 'totalValue')
-      .where(`record.activity = '${activity}'`)
-      .getRawOne();
-
-    return sum.totalValue.toFixed(2);
+    const totalValue = await Repository.getCurrentValues(activity);
+    return Number(totalValue.toFixed(2));
   };
 
   getUsersRecordByYear = async (
@@ -87,19 +80,10 @@ export class RecordService {
     activity: string
   ): Promise<string> => {
     let message: string = '';
-    const repo = AppDataSource.getRepository(Record);
+
     const unit = activity === 'distance' ? 'km' : 'h';
 
-    const query = repo
-      .createQueryBuilder('record')
-      .select('record.userId')
-      .addSelect('SUM(record.value)', 'totalValue')
-      .andWhere(`record.activity = '${activity}'`)
-      .andWhere(`date_part('year', created_at) = ${year}`)
-      .groupBy('record.userId')
-      .orderBy('"totalValue"', 'DESC');
-
-    const records = await query.getRawMany();
+    const records = await Repository.getUsersRecordByYear(year, activity);
 
     const sum = records.reduce((accumulator, currentValue) => {
       return accumulator + currentValue.totalValue;
@@ -119,18 +103,9 @@ export class RecordService {
 
   getUsersRecord = async (activity: string): Promise<string> => {
     let message: string = '';
-    const repo = AppDataSource.getRepository(Record);
     const unit = activity === 'distance' ? 'km' : 'h';
 
-    const query = repo
-      .createQueryBuilder('record')
-      .select('record.userId')
-      .addSelect('SUM(record.value)', 'totalValue')
-      .andWhere(`record.activity = '${activity}'`)
-      .groupBy('record.userId')
-      .orderBy('"totalValue"', 'DESC');
-
-    const records = await query.getRawMany();
+    const records = await Repository.getUsersRecord(activity);
 
     const sum = records.reduce((accumulator, currentValue) => {
       return accumulator + currentValue.totalValue;
@@ -154,18 +129,15 @@ export class RecordService {
     activity: string,
     values: number[]
   ): Promise<void> => {
-    console.log('saving data for user ' + userId);
     const record = new Record();
     const valuesSum = values.reduce((accumulator, current) => {
       return accumulator + current;
     }, 0);
 
-    record.message = message;
     record.userId = userId;
     record.activity = activity;
     record.value = Number(valuesSum.toFixed(2));
 
-    await AppDataSource.manager.save(record);
-    console.log('user record saved, id: ' + record.id);
+    await Repository.saveRecord(record);
   };
 }

@@ -31,7 +31,7 @@ export default class NoEventCommandHandler extends AbstractHandler {
   private async addEntires(request: Message): Promise<HandleResult | null> {
     const recordService = new RecordService();
 
-    var result = await recordService.addRecords(
+    const result = await recordService.addRecords(
       JSON.stringify(request),
       request.text,
       request.user
