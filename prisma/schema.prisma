@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model event {
+  id                 Int      @id(map: "PK_30c2f3bbaf6d34a55f8ae6e4614") @default(autoincrement())
+  channelId          String   @db.VarChar
+  theme              String?  @db.VarChar
+  eventName          String   @db.VarChar
+  created_at         DateTime @default(now()) @db.Timestamp(6)
+  ends_at            DateTime @db.Timestamp(6)
+  pointsForKilometre Int
+  pointsForHour      Int
+  totalPointsToScore Int
+  finished           Boolean  @default(false)
+}
+
+model event_records {
+  id       Int @id(map: "PK_9a30ab4991c4b36e81d164cc3fe") @default(autoincrement())
+  eventId  Int
+  recordId Int
+}
+
+model record {
+  id         Int      @id(map: "PK_5cb1f4d1aff275cf9001f4343b9") @default(autoincrement())
+  userId     String   @db.VarChar
+  activity   String   @db.VarChar
+  message    String   @db.VarChar
+  value      Float
+  created_at DateTime @default(now()) @db.Timestamp(6)
+}
