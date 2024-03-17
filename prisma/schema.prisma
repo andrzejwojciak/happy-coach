@@ -10,7 +10,6 @@ datasource db {
 model event {
   id                 Int      @id(map: "PK_30c2f3bbaf6d34a55f8ae6e4614") @default(autoincrement())
   channelId          String   @db.VarChar
-  theme              String?  @db.VarChar
   eventName          String   @db.VarChar
   created_at         DateTime @default(now()) @db.Timestamp(6)
   ends_at            DateTime @db.Timestamp(6)
@@ -18,6 +17,8 @@ model event {
   pointsForHour      Int
   totalPointsToScore Int
   finished           Boolean  @default(false)
+  themeId            Int?
+  theme              Theme?    @relation(fields: [themeId], references: [id])
 }
 
 model event_records {
@@ -33,4 +34,31 @@ model record {
   message    String   @db.VarChar
   value      Float
   created_at DateTime @default(now()) @db.Timestamp(6)
+  user       User     @relation(fields: [userId], references: [id])
+}
+
+model Theme {
+  id      Int    @id @default(autoincrement())
+  name    String
+  start   String
+  finish  String
+  pawn    String
+  events  event[]
+}
+
+model Setting {
+  id      Int    @id @default(autoincrement())
+  name    String
+  value   String
+  active  Boolean
+}
+
+model User {
+  id              String    @id
+  email           String?
+  password_hash   String?
+  firstLoginDate  String?
+  lastLoginDate   String?
+  isAdmin         Boolean?
+  records         record[]
 }

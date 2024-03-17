@@ -1,7 +1,7 @@
 export type Event = {
   id: number;
   channelId: string;
-  theme: string;
+  themeId: number | null;
   eventName: string;
   created_at: Date;
   ends_at: Date;

@@ -9,19 +9,13 @@ export class RecordService {
   prepareMessage = (
     newRecords: number[],
     currentSum: number,
-    unit: string,
+    unit: string
   ): string => {
     const recordsSum = newRecords.reduce((accumulator, current) => {
       return accumulator + current;
     }, 0);
 
     const initial = currentSum - recordsSum;
-
-    console.log(recordsSum);
-    console.log(newRecords);
-    console.log(currentSum);
-    console.log(initial);
-
     let message = `${initial.toFixed(2)}${unit}`;
 
     newRecords.forEach((record) => {
@@ -36,12 +30,12 @@ export class RecordService {
   addRecords = async (
     logMessage: string,
     message: string,
-    userId: string,
+    userId: string
   ): Promise<string> => {
     const distance = this.getNumbersFromMessage(message, "km");
     const hours = this.getNumbersFromMessage(message, "h");
     this.getNumbersFromMessage(message, "min").forEach((minute) =>
-      hours.push(minute / 60),
+      hours.push(minute / 60)
     );
 
     let responseMessage: string = "";
@@ -64,7 +58,7 @@ export class RecordService {
   getNumbersFromMessage = (message: string, unit: string): number[] => {
     const regex = new RegExp(
       `\\+[0-9][0-9]{0,2}(?:[.,][0-9]{0,2})?${unit}`,
-      "g",
+      "g"
     );
     const matches = message.match(regex);
 
@@ -87,7 +81,7 @@ export class RecordService {
 
   getUsersRecordByYear = async (
     year: number,
-    activity: string,
+    activity: string
   ): Promise<string> => {
     let message: string = "";
 
@@ -104,8 +98,8 @@ export class RecordService {
     records.forEach(
       (record) =>
         (message += `\n<@${record.userId}> - ${record.totalValue.toFixed(
-          2,
-        )}${unit}`),
+          2
+        )}${unit}`)
     );
 
     return message;
@@ -126,8 +120,8 @@ export class RecordService {
     records.forEach(
       (record) =>
         (message += `\n<@${record.userId}> - ${record.totalValue.toFixed(
-          2,
-        )}${unit}`),
+          2
+        )}${unit}`)
     );
 
     return message;
@@ -137,7 +131,7 @@ export class RecordService {
     userId: string,
     message: string,
     activity: string,
-    values: number[],
+    values: number[]
   ): Promise<void> => {
     const valuesSum = values.reduce((accumulator, current) => {
       return accumulator + current;

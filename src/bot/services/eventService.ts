@@ -93,7 +93,12 @@ export class EventService {
     if (pointsScored >= event.totalPointsToScore)
       responseMessage = await this.finishEvent(event, pointsScored);
     else {
-      if (event.theme === "dogs") {
+      if (event.themeId) {
+        responseMessage += `\ntotal score:  ${pointsScored}/${event.totalPointsToScore} points`;
+        return responseMessage;
+
+        // TOTO: Adjust to new theme entity
+
         const percentScored = (pointsScored / event.totalPointsToScore) * 100;
 
         const start = ":dog-house:"; // TODO: get from event

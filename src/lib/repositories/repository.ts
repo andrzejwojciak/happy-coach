@@ -8,7 +8,7 @@ export const GetEventAsync = async (
 ): Promise<null | {
   id: number;
   channelId: string;
-  theme: string | null;
+  themeId: number | null;
   eventName: string;
   created_at: Date;
   ends_at: Date;
@@ -35,7 +35,7 @@ export const GetEventAsync = async (
 export const SaveEvent = async (event: {
   eventName: string;
   channelId: string;
-  theme: string;
+  themeId: number | null;
   ends_at: Date;
   pointsForKilometre: number;
   pointsForHour: number;
