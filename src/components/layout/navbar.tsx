@@ -4,6 +4,7 @@ import {
   ArrowLeftEndOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Navbar() {
   const isLoggedIn = false;
@@ -11,7 +12,7 @@ export default function Navbar() {
     <div className="flex justify-center">
       <div className="w-900 flex flex-row justify-between">
         <div>
-          <img
+          <Image
             src="/happy-coach-logo-black.png"
             alt="HappyCoach logo"
             width={110}
