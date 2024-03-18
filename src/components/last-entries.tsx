@@ -20,10 +20,10 @@ function calculateAddedTime(currentTime: number, created_at: number): string {
 
 export default async function LastEntires() {
   const currentTime = new Date().getTime();
-  const lastEntires = await getLastEntries(8);
+  const lastEntires = await getLastEntries(9);
   return (
     <div>
-      SOME LAST ENTRIES WIP
+      WIP: last entires here
       {lastEntires.map((lastEntry) => {
         const unit = lastEntry.unit === Unit.Kilometers ? "km" : "h";
         return (

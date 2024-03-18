@@ -25,7 +25,7 @@ export class EventService {
   }
 
   public async SaveEventAsync(
-    createEventModel: CreateEventDetails,
+    createEventModel: CreateEventDetails
   ): Promise<HandleResult | null> {
     const event = {
       channelId: createEventModel.channelId,
@@ -48,11 +48,11 @@ export class EventService {
     logMessage: string,
     message: string,
     userId: string,
-    event: Event,
+    event: Event
   ): Promise<string> {
     const distances = this.recordService.getNumbersFromMessage(
       message,
-      Unit.Kilometer,
+      Unit.Kilometer
     );
     const hours = this.recordService.getNumbersFromMessage(message, Unit.Hour);
 
@@ -68,7 +68,7 @@ export class EventService {
       responseMessage += this.prepareMessage(
         hours,
         Unit.Time,
-        event.pointsForHour,
+        event.pointsForHour
       );
     }
 
@@ -78,13 +78,13 @@ export class EventService {
         logMessage,
         Unit.Distance,
         distances,
-        event.id,
+        event.id
       );
 
       responseMessage += this.prepareMessage(
         distances,
         Unit.Distance,
-        event.pointsForKilometre,
+        event.pointsForKilometre
       );
     }
 
@@ -94,32 +94,24 @@ export class EventService {
       responseMessage = await this.finishEvent(event, pointsScored);
     else {
       if (event.themeId) {
-        responseMessage += `\ntotal score:  ${pointsScored}/${event.totalPointsToScore} points`;
-        return responseMessage;
-
-        // TOTO: Adjust to new theme entity
-
         const percentScored = (pointsScored / event.totalPointsToScore) * 100;
 
-        const start = ":dog-house:"; // TODO: get from event
-        const finish = ":bone:"; // TODO: Get from event
-        const dogEmoji = ":dog_2:"; // Todo: get from event
         const fieldChar = "–";
         const totalFieldsToJump = 20;
 
         let fieldsJumped = Math.trunc(
-          (percentScored / 100) * totalFieldsToJump,
+          (percentScored / 100) * totalFieldsToJump
         );
         let fieldsToJump = totalFieldsToJump - fieldsJumped - 1;
 
         let progressBar =
           fieldChar.repeat(fieldsJumped) +
-          dogEmoji +
+          event.theme?.pawn +
           fieldChar.repeat(fieldsToJump);
 
-        responseMessage += `\n${start}${progressBar}${finish} (${percentScored.toFixed(
-          2,
-        )}%)`;
+        responseMessage += `\n${event.theme?.startSign}${progressBar}${
+          event.theme?.stopSign
+        } (${percentScored.toFixed(2)}%)`;
         responseMessage += `\n${pointsScored}/${event.totalPointsToScore} points`;
       } else {
         responseMessage += `\ntotal score:  ${pointsScored}/${event.totalPointsToScore} points`;
@@ -131,7 +123,7 @@ export class EventService {
 
   private async finishEvent(
     event: Event,
-    pointsScored: Number,
+    pointsScored: Number
   ): Promise<string> {
     event.finished = true;
     await SaveEvent(event);
@@ -160,13 +152,13 @@ export class EventService {
   private prepareMessage(
     newRecords: number[],
     unit: string,
-    pointsForUnit: number,
+    pointsForUnit: number
   ): string {
     let message = "";
 
     if (newRecords.length === 1) {
       return (message += `you scored ${(newRecords[0] * pointsForUnit).toFixed(
-        0,
+        0
       )} points for ${unit}\n`);
     }
 
@@ -184,7 +176,7 @@ export class EventService {
     });
 
     message += ` = ${(currentSum * pointsForUnit).toFixed(
-      0,
+      0
     )} points for ${unit}\n`;
 
     return message;

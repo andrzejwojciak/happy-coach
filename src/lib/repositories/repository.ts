@@ -2,24 +2,14 @@
 
 import { ResultItem } from "@/src/bot/services/models/resultItemModel";
 import { prismaClient } from "@/src/lib/data/client";
+import { Event } from "@/src/bot/services/models/Event";
 
 export const GetEventAsync = async (
-  channelId: string,
-): Promise<null | {
-  id: number;
-  channelId: string;
-  themeId: number | null;
-  eventName: string;
-  created_at: Date;
-  ends_at: Date;
-  pointsForKilometre: number;
-  pointsForHour: number;
-  totalPointsToScore: number;
-  finished: boolean;
-}> => {
+  channelId: string
+): Promise<null | Event> => {
   const today = new Date();
 
-  const event = await prismaClient.event.findFirst({
+  const eventResult = await prismaClient.event.findFirst({
     where: {
       channelId: channelId,
       ends_at: {
@@ -27,9 +17,36 @@ export const GetEventAsync = async (
       },
       finished: false,
     },
+    include: {
+      theme: true,
+    },
   });
 
-  return event;
+  if (eventResult) {
+    return {
+      id: eventResult.id,
+      channelId: eventResult.channelId,
+      themeId: eventResult.themeId,
+      eventName: eventResult.eventName,
+      created_at: eventResult.created_at,
+      ends_at: eventResult.ends_at,
+      pointsForKilometre: eventResult.pointsForKilometre,
+      pointsForHour: eventResult.pointsForHour,
+      totalPointsToScore: eventResult.totalPointsToScore,
+      finished: eventResult.finished,
+      theme:
+        eventResult.theme == null
+          ? null
+          : {
+              pawn: eventResult.theme.pawn,
+              startSign: eventResult.theme.start,
+              stopSign: eventResult.theme.finish,
+              themeName: eventResult.theme.name,
+            },
+    };
+  }
+
+  return null;
 };
 
 export const SaveEvent = async (event: {
@@ -65,7 +82,7 @@ export const saveRecordAsync = async (
   message: string,
   activity: string,
   values: number[],
-  eventId: number,
+  eventId: number
 ) => {
   const valuesSum = values.reduce((accumulator, current) => {
     return accumulator + current;
@@ -122,7 +139,7 @@ export const getCurrentValues = async (activity: string): Promise<number> => {
 
 export const getUsersRecordByYear = async (
   year: number,
-  activity: string,
+  activity: string
 ): Promise<any[]> => {
   const result = await prismaClient.$queryRaw<any[]>`
         SELECT record."userId", SUM(record.value) AS "totalValue"

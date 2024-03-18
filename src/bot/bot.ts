@@ -47,15 +47,29 @@ let status = globalForStatus.status || "Disabled";
 if (process.env.NODE_ENV !== "production") globalForStatus.status = "Disabled";
 
 const startBot = async () => {
+  if (status === "Enabled") {
+    return;
+  }
   await app.start();
-  console.log("⚡️ Bolt app is running!");
+
   status = "Enabled";
+  await app.client.chat.postMessage({
+    channel: process.env.MAIN_CHANNEL ?? "",
+    text: "Hey everyone! I'm back and eager to hear about your achievements today :muscle: I'm all ears!",
+  });
 };
 
 const stopBot = async () => {
+  if (status === "Disabled") {
+    return;
+  }
   await app.stop();
-  console.log("⚡️ Bolt app is stopping!");
+
   status = "Disabled";
+  await app.client.chat.postMessage({
+    channel: process.env.MAIN_CHANNEL ?? "",
+    text: "Someone shut me down. Don't post anything until I'm back :pray:",
+  });
 };
 
 const botStatus = (): string => {

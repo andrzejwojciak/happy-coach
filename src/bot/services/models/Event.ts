@@ -9,4 +9,12 @@ export type Event = {
   pointsForHour: number;
   totalPointsToScore: number;
   finished: boolean;
+  theme: Theme | null;
+};
+
+export type Theme = {
+  startSign: string;
+  stopSign: string;
+  pawn: string;
+  themeName: string;
 };

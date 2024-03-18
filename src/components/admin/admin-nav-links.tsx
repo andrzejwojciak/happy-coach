@@ -3,23 +3,19 @@
 import Link from "next/link";
 import clsx from "clsx";
 import { usePathname } from "next/navigation";
-import path from "path";
 
 const links = [
-  { name: "Home", href: "/" },
   {
-    name: "Admin",
+    name: "Bot",
     href: "/admin",
   },
-  {
-    name: "About",
-    href: "/about",
-  },
+  { name: "Users", href: "/admin/users" },
+  { name: "Settings", href: "/admin/settings" },
+  { name: "Logs", href: "/admin/logs" },
 ];
 
-export default function NavLinks() {
-  let pathname = usePathname();
-  pathname = "/" + pathname.split("/")[1];
+export default function AdminNavLinks() {
+  const pathname = usePathname();
   return (
     <>
       {links.map((link) => {

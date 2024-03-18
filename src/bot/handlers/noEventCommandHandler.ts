@@ -2,6 +2,7 @@ import { AbstractHandler } from "@/src/bot/handlers/handler";
 import { HandleResult } from "@/src/bot/types/handleResult";
 import { Message } from "@/src/bot/types/message";
 import { RecordService } from "@/src/bot/services/recordService";
+import { getOrCreateUserById } from "@/src/lib/services/userService";
 
 export default class NoEventCommandHandler extends AbstractHandler {
   public async handle(request: Message): Promise<HandleResult | null> {
@@ -11,11 +12,11 @@ export default class NoEventCommandHandler extends AbstractHandler {
     switch (true) {
       case new RegExp(
         "\\+[0-9][0-9]{0,2}(?:[.,][0-9]{0,2})?(h|km|min)",
-        "m",
+        "m"
       ).test(request.text):
         return await this.addEntires(request);
       case new RegExp(/^stats (distance|time) [2-9][0-9]{3}$/).test(
-        request.text, // Error
+        request.text // Error
       ):
         return await this.checkActivityStatsByYear(request);
       case new RegExp(/^stats (distance|time)$/).test(request.text): // Works but shows stats for time and distance
@@ -31,10 +32,12 @@ export default class NoEventCommandHandler extends AbstractHandler {
   private async addEntires(request: Message): Promise<HandleResult | null> {
     const recordService = new RecordService();
 
+    await getOrCreateUserById(request.user);
+
     const result = await recordService.addRecords(
       JSON.stringify(request),
       request.text,
-      request.user,
+      request.user
     );
 
     return {
@@ -45,7 +48,7 @@ export default class NoEventCommandHandler extends AbstractHandler {
   }
 
   private async checkActivityStatsByYear(
-    request: Message,
+    request: Message
   ): Promise<HandleResult | null> {
     if (request.thread_ts) return null;
     const recordService = new RecordService();
@@ -55,7 +58,7 @@ export default class NoEventCommandHandler extends AbstractHandler {
 
     const usersRecords = await recordService.getUsersRecordByYear(
       Number(year![0]),
-      activity![0],
+      activity![0]
     );
 
     const replyMessage = usersRecords ? usersRecords : "nothing here";
@@ -66,7 +69,7 @@ export default class NoEventCommandHandler extends AbstractHandler {
   }
 
   private async checkActivityStats(
-    request: Message,
+    request: Message
   ): Promise<HandleResult | null> {
     if (request.thread_ts) return null;
     const recordService = new RecordService();
