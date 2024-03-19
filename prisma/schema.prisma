@@ -56,10 +56,15 @@ model Setting {
 model User {
   id              String    @id
   email           String?
+  display_name    String?
   password_hash   String?
   firstLoginDate  DateTime?
   lastLoginDate   DateTime?
-  isAdmin         Boolean?
+  isAdmin         Boolean @default(false)
   dataFetched     Boolean @default(false)
   records         record[]
+  image_24        String?
+  image_32        String?
+  image_48        String?
+  image_72        String?
 }

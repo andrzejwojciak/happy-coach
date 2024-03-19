@@ -76,4 +76,4 @@ const botStatus = (): string => {
   return status;
 };
 
-export { startBot, stopBot, botStatus };
+export { startBot, stopBot, botStatus, app as slackApp };
