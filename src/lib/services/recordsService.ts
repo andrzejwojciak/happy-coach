@@ -3,10 +3,12 @@ import { OverallActivitiesSummary } from "@/src/lib/types/OverallActivitiesSumma
 import { Activity as ActivityEnum } from "@/src/lib/types/enums/Activity";
 import { Unit } from "@/src/lib/types/enums/Unit";
 import { Activity } from "@/src/lib/types/Activity";
+import { unstable_noStore as noStore } from "next/cache";
 
 export async function getOverallActivitiesSummary(): Promise<
   OverallActivitiesSummary[]
 > {
+  noStore();
   const overallActivitiesSummary = await prismaClient.record.groupBy({
     by: ["activity"],
     _sum: {
@@ -32,6 +34,7 @@ export async function getOverallActivitiesSummary(): Promise<
 export async function getLastEntries(
   numberOfLastEntries: number
 ): Promise<Activity[]> {
+  noStore();
   const recentRecords = await prismaClient.record.findMany({
     orderBy: {
       created_at: "desc",
