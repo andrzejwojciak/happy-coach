@@ -30,6 +30,16 @@ export async function getOrCreateUserById(userId: string): Promise<User> {
   return result;
 }
 
+export async function getUserByEmail(email: string): Promise<User | null> {
+  const user = await prismaClient.user.findFirst({
+    where: {
+      email: email,
+    },
+  });
+
+  return user as User;
+}
+
 async function synchronizeUserData(id: string) {
   const fetchedUser = await slackApp.client.users.info({
     user: id,

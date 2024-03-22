@@ -18,14 +18,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={dmSans.className}>
-        <div className="h-screen w-screen text-blac bg-white text-black flex flex-col">
-          <Navbar />
-          <div className="h-full flex flex-row justify-center pt-10">
-            <div className="w-800">{children}</div>
-          </div>
-          <Footer />
-        </div>
+      <body className={dmSans.className + " h-screen w-screen"}>
+        {children}
       </body>
     </html>
   );
