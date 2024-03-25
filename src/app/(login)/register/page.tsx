@@ -3,11 +3,11 @@
 import {
   sendAuthCode as sendAuthCodeAction,
   verifyAuthCode as verifyAuthCodeAction,
-  finishSignup as finishSignupAction,
+  finishSignUp as finishSignUpAction,
 } from "@/src/lib/actions/authActions";
 import { ChangeEvent, FormEvent, useRef, useState } from "react";
 import Link from "next/link";
-import router from "next/router";
+import { useRouter } from "next/navigation";
 
 type Register = {
   email: string;
@@ -20,9 +20,10 @@ type Register = {
 };
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [emailError, setEmailError] = useState<string>();
   const [emailVerifyError, setEmailVerifyError] = useState<string>();
-  const [singupError, setSingupError] = useState<string>();
+  const [singUpError, setSingUpError] = useState<string>();
   const [inputValue, setInputValue] = useState<Register>({
     email: "",
     password: "",
@@ -47,7 +48,7 @@ export default function RegisterPage() {
     }
 
     if (inputValue.emailVerified && inputValue.authCodeSent) {
-      await finishSignup(event);
+      await finishSignUp(event);
       return;
     }
   }
@@ -90,14 +91,12 @@ export default function RegisterPage() {
     }));
   }
 
-  async function finishSignup(event: React.FormEvent) {
+  async function finishSignUp(event: React.FormEvent) {
     console.log(inputValue);
 
     if (!inputValue?.password) return;
 
-    console.log("finishSignup");
-
-    const response = await finishSignupAction({
+    const response = await finishSignUpAction({
       email: inputValue.email,
       password: inputValue.password,
       retypedPassword: inputValue.retypedPassword,
@@ -106,13 +105,11 @@ export default function RegisterPage() {
     });
 
     if (!response.success) {
-      setSingupError(response.errorMessage);
+      setSingUpError(response.errorMessage ?? "");
       return;
     }
 
-    router.push("/login", {
-      query: { accountCreated: true },
-    });
+    router.push("/login?accountCreated=true");
   }
 
   function handleChange(event: ChangeEvent<HTMLInputElement>): void {
@@ -132,7 +129,7 @@ export default function RegisterPage() {
       <form onSubmit={onSubmit}>
         <div className="flex flex-col font-bold">
           <div>
-            Email <br />
+            Your slack email <br />
             <input
               value={inputValue.email}
               type="text"
@@ -184,7 +181,7 @@ export default function RegisterPage() {
                   name="retypedPassword"
                 />
               </div>
-              <div className="text-rose-700">{singupError}</div>
+              <div className="text-rose-700">{singUpError}</div>
             </>
           ) : null}
           <div className="mt-10">

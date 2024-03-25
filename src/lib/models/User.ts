@@ -1,7 +1,7 @@
 export type User = {
   id: string;
   email?: string;
-  password_hash?: string;
+  passwordHash?: string;
   firstLoginDate?: Date;
   lastLoginDate?: Date;
   isAdmin?: boolean;
