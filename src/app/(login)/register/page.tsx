@@ -67,7 +67,7 @@ export default function RegisterPage() {
     setInputValue((prevState) => ({
       ...prevState,
       authCodeSent: true,
-      state: response.state ?? "error",
+      state: response.data ?? "error",
     }));
   }
 

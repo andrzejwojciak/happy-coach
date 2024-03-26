@@ -1,5 +1,8 @@
 export type Result = {
   success: boolean;
-  state?: string;
   errorMessage?: string;
+};
+
+export type DataResult<T> = Result & {
+  data?: T;
 };

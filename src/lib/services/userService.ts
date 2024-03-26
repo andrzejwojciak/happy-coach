@@ -54,9 +54,9 @@ export async function getUserByCredentials(
     },
   });
 
-  if (!user) return null;
+  if (!user || !user.password_hash) return null;
 
-  if (!isPasswordMatching(user.password_hash!, password)) return null;
+  if (!isPasswordMatching(user.password_hash, password)) return null;
 
   return user as User;
 }

@@ -7,15 +7,9 @@ import {
   getUserByEmail,
 } from "@/src/lib/services/userService";
 import { v4 as uuid } from "uuid";
-import { Result } from "@/src/lib/types/result";
+import { DataResult, Result } from "@/src/lib/types/Result";
 import { RegisterModel } from "@/src/lib/types/RegisterModel";
-import { signIn } from "next-auth/react";
-import {
-  CacheData,
-  getCache,
-  removeCache,
-  saveCache,
-} from "@/src/lib/cache/cacheService";
+import { getCache, removeCache, saveCache } from "@/src/lib/cache/cacheService";
 
 type registerState = {
   state: string;
@@ -25,7 +19,7 @@ type registerState = {
 
 const registerStateExpiresIn = 1000 * 60 * 20;
 
-export async function sendAuthCode(email: string): Promise<Result> {
+export async function sendAuthCode(email: string): Promise<DataResult<string>> {
   const user = await getUserByEmail(email);
 
   if (user === null) {
@@ -61,7 +55,7 @@ export async function sendAuthCode(email: string): Promise<Result> {
     text: "Here is you sign up code: " + code,
   });
 
-  return { success: true, state: newGuid };
+  return { success: true, data: newGuid };
 }
 
 export async function verifyAuthCode(
@@ -87,7 +81,7 @@ export async function verifyAuthCode(
   return { success: true };
 }
 
-export async function finishSignUp(register: RegisterModel) {
+export async function finishSignUp(register: RegisterModel): Promise<Result> {
   if (register.password !== register.retypedPassword) {
     return {
       success: false,
@@ -111,16 +105,20 @@ export async function finishSignUp(register: RegisterModel) {
 
   return {
     success: userCreated,
-    errorMessage: userCreated ? null : "Something went wrong",
+    errorMessage: userCreated ? undefined : "Something went wrong",
   };
 }
 
-export async function login(login: string, password: string): Promise<Result> {
+export async function login({
+  login,
+  password,
+}: {
+  login: string;
+  password: string;
+}): Promise<Result> {
   const user = await getUserByCredentials(login, password);
 
-  if (!user) return { success: false, errorMessage: "User does not exist" };
-
-  signIn("credentials", { username: user.email, userId: user.id });
+  if (!user) return { success: false, errorMessage: "Wrong login or password" };
 
   return { success: true };
 }
