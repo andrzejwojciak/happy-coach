@@ -1,7 +1,7 @@
 "use client";
 
 import { ChangeEvent, FormEvent, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import Link from "next/link";
 import { login } from "@/src/lib/actions/authActions";
@@ -19,6 +19,7 @@ function AfterRedirectMessage() {
 }
 
 export default function LoginPage() {
+  const router = useRouter();
   const [loginError, setLoginError] = useState("");
   const [inputValue, setInputValue] = useState<LoginForm>({
     login: "",
@@ -30,17 +31,18 @@ export default function LoginPage() {
 
     if (!inputValue.login || !inputValue.password) return;
 
-    console.log("ELO");
-
     const loginResult = await login({
       login: inputValue.login,
       password: inputValue.password,
     });
 
-    console.log(loginResult);
-
     if (!loginResult.success)
       setLoginError(loginResult.errorMessage ?? "something went wrong");
+
+    if (loginResult.data) {
+      localStorage.setItem("authorization", loginResult.data);
+      router.push("/");
+    }
   }
 
   function handleChange(event: ChangeEvent<HTMLInputElement>): void {

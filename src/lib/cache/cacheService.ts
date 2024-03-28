@@ -1,10 +1,29 @@
-type cacheType = { [key: string]: CacheData };
+export type CacheData = {
+  value: string;
+  expiresIn?: number;
+  clearAfter?: Date;
+};
+
+export type cacheType = { [key: string]: CacheData };
 
 const globalForCache = globalThis as unknown as { cache: cacheType };
 
-let cache = globalForCache.cache || {};
+const cache = globalForCache.cache || {};
 
-if (process.env.NODE_ENV !== "production") globalForCache.cache = {};
+if (process.env.NODE_ENV !== "production") globalForCache.cache = cache;
+
+setInterval(() => {
+  const filteredCache = Object.fromEntries(
+    Object.entries(cache).filter(
+      ([key, value]) =>
+        value.clearAfter && value.clearAfter.getTime() < new Date().getTime()
+    )
+  );
+
+  Object.keys(filteredCache).forEach((key) => {
+    removeCacheByKey(key);
+  });
+}, 1000);
 
 export function getCache(key: string): CacheData | null {
   const cacheData = cache[key];
@@ -14,17 +33,10 @@ export function getCache(key: string): CacheData | null {
 export function saveCache(key: string, cacheToSave: CacheData) {
   cache[key] = cacheToSave;
 
-  if (cacheToSave.expires_in)
-    setInterval(removeCache, cacheToSave.expires_in, key);
+  if (cacheToSave.expiresIn)
+    setInterval(removeCacheByKey, cacheToSave.expiresIn, key);
 }
 
-export function removeCache(key: string) {
-  console.log(cache);
-
+export function removeCacheByKey(key: string) {
   if (cache.hasOwnProperty(key)) delete cache[key];
 }
-
-export type CacheData = {
-  value: string;
-  expires_in?: number;
-};

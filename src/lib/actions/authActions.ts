@@ -9,9 +9,16 @@ import {
 import { v4 as uuid } from "uuid";
 import { DataResult, Result } from "@/src/lib/types/Result";
 import { RegisterModel } from "@/src/lib/types/RegisterModel";
-import { getCache, removeCache, saveCache } from "@/src/lib/cache/cacheService";
+import {
+  getCache,
+  removeCacheByKey,
+  saveCache,
+} from "@/src/lib/cache/cacheService";
+import { cookies } from "next/headers";
+import { CurrentUser } from "../types/CurrentUser";
+import { setCurrentUser } from "../services/sessionService";
 
-type registerState = {
+type RegisterState = {
   state: string;
   code: string;
   sentAt: Date;
@@ -25,7 +32,7 @@ export async function sendAuthCode(email: string): Promise<DataResult<string>> {
   if (user === null) {
     return {
       success: false,
-      errorMessage: "Email not found",
+      errorMessage: "Email is not listed as an active channel member",
     };
   }
 
@@ -39,7 +46,7 @@ export async function sendAuthCode(email: string): Promise<DataResult<string>> {
   const code = generateRandomNumbers(5);
   const newGuid: string = uuid();
 
-  const registerState: registerState = {
+  const registerState: RegisterState = {
     state: newGuid,
     code: code,
     sentAt: new Date(),
@@ -47,12 +54,12 @@ export async function sendAuthCode(email: string): Promise<DataResult<string>> {
 
   saveCache(registerState.state, {
     value: JSON.stringify(registerState),
-    expires_in: registerStateExpiresIn,
+    expiresIn: registerStateExpiresIn,
   });
 
   await slackApp.client.chat.postMessage({
     channel: user.id,
-    text: "Here is you sign up code: " + code,
+    text: "Here is your sign up code: " + code,
   });
 
   return { success: true, data: newGuid };
@@ -72,7 +79,7 @@ export async function verifyAuthCode(
     };
   }
 
-  const state: registerState = JSON.parse(foundCache.value);
+  const state: RegisterState = JSON.parse(foundCache.value);
 
   if (state.code !== code) {
     return { success: false, errorMessage: "Wrong verification code" };
@@ -101,7 +108,7 @@ export async function finishSignUp(register: RegisterModel): Promise<Result> {
     password: register.password,
   });
 
-  removeCache(register.state);
+  removeCacheByKey(register.state);
 
   return {
     success: userCreated,
@@ -115,12 +122,24 @@ export async function login({
 }: {
   login: string;
   password: string;
-}): Promise<Result> {
+}): Promise<DataResult<string>> {
+  if (login === "checking") console.log(getCache(password));
+
   const user = await getUserByCredentials(login, password);
 
   if (!user) return { success: false, errorMessage: "Wrong login or password" };
 
-  return { success: true };
+  const newGuid: string = uuid();
+  const currentUser: CurrentUser = {
+    email: user.email!,
+    role: user.isAdmin ? "admin" : "user",
+    displayName: user.displayName!,
+    loggedAt: new Date(),
+  };
+
+  setCurrentUser(newGuid, currentUser);
+
+  return { success: true, data: newGuid };
 }
 
 function generateRandomNumbers(numberOfNumbers: number): string {
@@ -132,4 +151,18 @@ function generateRandomNumbers(numberOfNumbers: number): string {
   }
 
   return randomNumbers;
+}
+
+function addHours(date: Date, hours: number) {
+  const hoursToAdd = hours * 60 * 60 * 1000;
+  const newDate = new Date(date);
+  newDate.setTime(date.getTime() + hoursToAdd);
+  return newDate;
+}
+
+function addSeconds(date: Date, seconds: number) {
+  const secondsToAdd = seconds * 1000;
+  const newDate = new Date(date);
+  newDate.setTime(date.getTime() + secondsToAdd);
+  return newDate;
 }
