@@ -3,7 +3,7 @@ import { Unit } from "@/src/lib/types/enums/Unit";
 export type Activity = {
   id: number;
   userId: string;
-  ussername: string;
+  username: string;
   activity: string;
   unit: Unit;
   message: string;

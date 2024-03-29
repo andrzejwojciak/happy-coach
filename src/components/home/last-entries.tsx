@@ -28,7 +28,7 @@ export default async function LastEntires() {
         const unit = lastEntry.unit === Unit.Kilometers ? "km" : "h";
         return (
           <div key={lastEntry.id}>
-            {lastEntry.ussername}: added {lastEntry.value}
+            {lastEntry.username}: added {lastEntry.value}
             {unit} about{" "}
             {calculateAddedTime(currentTime, lastEntry.created_at.getTime())}{" "}
             ago

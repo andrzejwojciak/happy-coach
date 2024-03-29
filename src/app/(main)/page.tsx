@@ -1,5 +1,5 @@
-import LastEntires from "@/src/components/last-entries";
-import OverallActivitySummary from "@/src/components/overall-activity-summary";
+import LastEntires from "@/src/components/home/last-entries";
+import OverallActivitySummary from "@/src/components/home/overall-activity-summary";
 
 export default async function Home() {
   return (

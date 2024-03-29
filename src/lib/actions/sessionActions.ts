@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { getCache } from "@/src/lib/cache/cacheService";
 import { CurrentUser } from "@/src/lib/types/CurrentUser";
-import { setCurrentUser } from "../services/sessionService";
+import { setCurrentUser } from "@/src/lib/services/sessionService";
 
 export async function getCurrentUser(
   updateCookie: boolean = false

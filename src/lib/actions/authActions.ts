@@ -14,9 +14,8 @@ import {
   removeCacheByKey,
   saveCache,
 } from "@/src/lib/cache/cacheService";
-import { cookies } from "next/headers";
-import { CurrentUser } from "../types/CurrentUser";
-import { setCurrentUser } from "../services/sessionService";
+import { CurrentUser } from "@/src/lib/types/CurrentUser";
+import { setCurrentUser } from "@/src/lib/services/sessionService";
 
 type RegisterState = {
   state: string;
@@ -131,6 +130,7 @@ export async function login({
 
   const newGuid: string = uuid();
   const currentUser: CurrentUser = {
+    id: user.id!,
     email: user.email!,
     role: user.isAdmin ? "admin" : "user",
     displayName: user.displayName!,
