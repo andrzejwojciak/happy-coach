@@ -137,7 +137,7 @@ export async function login({
     loggedAt: new Date(),
   };
 
-  setCurrentUser(newGuid, currentUser);
+  setCurrentUser(newGuid, currentUser, true);
 
   return { success: true, data: newGuid };
 }
