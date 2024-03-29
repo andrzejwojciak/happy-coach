@@ -3,13 +3,13 @@
 import Link from "next/link";
 import clsx from "clsx";
 import { usePathname } from "next/navigation";
-import path from "path";
 
 const links = [
   { name: "Home", href: "/" },
   {
     name: "Admin",
     href: "/admin",
+    roleRequired: "admin",
   },
   {
     name: "About",
@@ -17,12 +17,14 @@ const links = [
   },
 ];
 
-export default function NavLinks() {
+export default function NavLinks({ userRole }: { userRole?: string }) {
   let pathname = usePathname();
   pathname = "/" + pathname.split("/")[1];
   return (
     <>
       {links.map((link) => {
+        if (link.roleRequired && link.roleRequired !== userRole) return;
+
         return (
           <Link
             key={link.name}
