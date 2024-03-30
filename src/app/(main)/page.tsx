@@ -4,11 +4,11 @@ import OverallActivitySummary from "@/src/components/home/overall-activity-summa
 export default async function Home() {
   return (
     <div>
-      <div className="flex flex-row">
-        <div className="w-1/2">
+      <div className="flex flex-row justify-between">
+        <div>
           <OverallActivitySummary />
         </div>
-        <div className="w-1/2">
+        <div className="w-2/5">
           <LastEntires />
         </div>
       </div>

@@ -34,7 +34,7 @@ export default function Bot() {
     <div>
       <div>Bot status: {botStatus}</div>
       <div>
-        {botStatus === "Enabled" ? (
+        {botStatus === "On" ? (
           <button onClick={stopBot} className="hover:text-sky-400 text-sky-600">
             Stop bot
           </button>

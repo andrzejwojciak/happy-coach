@@ -82,4 +82,4 @@ const setBotStatus = (value: string) => {
   saveCache("bot-status", { value: value });
 };
 
-export { startBot, stopBot, getBotStatus as botStatus };
+export { startBot, stopBot, getBotStatus as botStatus, app as slackApp };

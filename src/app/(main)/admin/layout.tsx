@@ -11,7 +11,7 @@ export default async function Layout({
 }: {
   children: React.ReactNode;
 }) {
-  if (!isCurrentUserInRole("admin")) {
+  if (!(await isCurrentUserInRole("admin"))) {
     redirect("/");
   }
 

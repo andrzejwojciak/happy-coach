@@ -52,10 +52,10 @@ export default function Chart({
             userOverallDistance?.value,
           ],
           backgroundColor: [
-            "rgb(102, 102, 102)",
-            "rgb(115, 115, 115)",
-            "rgb(166, 166, 166)",
-            "rgb(179, 179, 179)",
+            "rgb(102, 181, 255)",
+            "rgb(128, 193, 255)",
+            "rgb(255, 187, 153)",
+            "rgb(255, 204, 179)",
           ],
           hoverOffset: 4,
         },
@@ -67,7 +67,7 @@ export default function Chart({
       datasets: [
         {
           data: [overallTime?.value, overallDistance?.value],
-          backgroundColor: ["rgb(102, 102, 102)", "rgb(166, 166, 166)"],
+          backgroundColor: ["rgb(102, 181, 255)", "rgb(255, 187, 153)"],
           hoverOffset: 4,
         },
       ],

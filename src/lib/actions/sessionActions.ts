@@ -15,7 +15,10 @@ export async function getCurrentUser(
 
   const userCache = getCache(authKey.value);
 
-  if (!userCache || !userCache.value) return null;
+  if (!userCache || !userCache.value) {
+    if (updateCookie) cookieStore.delete("authorization");
+    return null;
+  }
 
   const currentUser: CurrentUser = JSON.parse(userCache.value);
 
@@ -33,4 +36,12 @@ export async function isCurrentUserInRole(
   if (!currentUser) return false;
 
   return currentUser.role === role;
+}
+
+export async function isCurrentUserLogged(
+  updateCookie: boolean = false
+): Promise<boolean> {
+  const currentUser = await getCurrentUser(updateCookie);
+
+  return currentUser !== null;
 }

@@ -7,7 +7,10 @@ import { Activity as ActivityEnum } from "@/src/lib/types/enums/Activity";
 import { Unit } from "@/src/lib/types/enums/Unit";
 import { Activity } from "@/src/lib/types/Activity";
 import { unstable_noStore as noStore } from "next/cache";
-import { getCurrentUser } from "@/src/lib/actions/sessionActions";
+import {
+  getCurrentUser,
+  isCurrentUserLogged,
+} from "@/src/lib/actions/sessionActions";
 
 export async function getOverallActivitiesSummary(): Promise<
   OverallActivitiesSummary[]
@@ -80,18 +83,33 @@ export async function getLastEntries(
   numberOfLastEntries: number
 ): Promise<Activity[]> {
   noStore();
+
+  const isLogged = await isCurrentUserLogged();
+
   const recentRecords = await prismaClient.record.findMany({
     orderBy: {
       created_at: "desc",
     },
     take: numberOfLastEntries,
+    include: {
+      user: true,
+    },
   });
 
   const result: Activity[] = recentRecords.map((recentRecord) => {
     return {
       id: recentRecord.id,
       userId: recentRecord.userId,
-      username: "@username",
+      avatar:
+        !isLogged || recentRecord.user.image_72 === null
+          ? "/default-slack-avatar.png"
+          : recentRecord.user.image_72,
+      username:
+        "@" +
+        (isLogged
+          ? recentRecord.user.display_name ?? "Anonymous"
+          : (recentRecord.user.display_name?.substring(0, 1) ?? "U") +
+            ".".repeat(recentRecord.user.display_name?.length ?? 5)),
       activity: convertStringToActivityEnum(recentRecord.activity),
       unit: getUnitFromActivity(
         convertStringToActivityEnum(recentRecord.activity)

@@ -34,9 +34,11 @@ export function saveCache(key: string, cacheToSave: CacheData) {
   cache[key] = cacheToSave;
 
   if (cacheToSave.expiresIn)
-    setInterval(removeCacheByKey, cacheToSave.expiresIn, key);
+    setTimeout(removeCacheByKey, cacheToSave.expiresIn, key);
 }
 
 export function removeCacheByKey(key: string) {
-  if (cache.hasOwnProperty(key)) delete cache[key];
+  if (cache.hasOwnProperty(key)) {
+    delete cache[key];
+  }
 }
