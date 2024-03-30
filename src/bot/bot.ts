@@ -3,6 +3,7 @@ import EventCommandHandler from "@/src/bot/handlers/eventCommandHandler";
 import NoEventCommandHandler from "@/src/bot/handlers/noEventCommandHandler";
 import { Message } from "@/src/bot/types/message";
 import { App } from "@slack/bolt";
+import { getCache, saveCache } from "@/src/lib/cache/cacheService";
 
 const basicCommandsHandler = new BasicCommandsHandler();
 const eventCommandHandler = new EventCommandHandler();
@@ -40,19 +41,13 @@ const app = globalForApp.app || slackApp;
 
 if (process.env.NODE_ENV !== "production") globalForApp.app = slackApp;
 
-const globalForStatus = globalThis as unknown as { status: string };
-
-let status = globalForStatus.status || "Disabled";
-
-if (process.env.NODE_ENV !== "production") globalForStatus.status = "Disabled";
-
 const startBot = async () => {
-  if (status === "Enabled") {
+  if (getBotStatus() === "On") {
     return;
   }
   await app.start();
 
-  status = "Enabled";
+  setBotStatus("On");
   await app.client.chat.postMessage({
     channel: process.env.MAIN_CHANNEL ?? "",
     text: "Hey everyone! I'm back and eager to hear about your achievements today :muscle: I'm all ears!",
@@ -60,20 +55,31 @@ const startBot = async () => {
 };
 
 const stopBot = async () => {
-  if (status === "Disabled") {
+  if (getBotStatus() === "Off") {
     return;
   }
   await app.stop();
 
-  status = "Disabled";
+  setBotStatus("Off");
   await app.client.chat.postMessage({
     channel: process.env.MAIN_CHANNEL ?? "",
     text: "Someone shut me down. Don't post anything until I'm back :pray:",
   });
 };
 
-const botStatus = (): string => {
-  return status;
+const getBotStatus = (): string => {
+  let status = getCache("bot-status");
+
+  if (!status) {
+    status = { value: "Off" };
+    saveCache("bot-status", status);
+  }
+
+  return status.value;
 };
 
-export { startBot, stopBot, botStatus, app as slackApp };
+const setBotStatus = (value: string) => {
+  saveCache("bot-status", { value: value });
+};
+
+export { startBot, stopBot, getBotStatus as botStatus };
