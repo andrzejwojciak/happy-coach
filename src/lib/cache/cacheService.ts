@@ -10,7 +10,7 @@ const globalForCache = globalThis as unknown as { cache: cacheType };
 
 const cache = globalForCache.cache || {};
 
-if (process.env.NODE_ENV !== "production") globalForCache.cache = cache;
+globalForCache.cache = cache;
 
 setInterval(() => {
   const filteredCache = Object.fromEntries(

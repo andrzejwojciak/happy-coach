@@ -39,7 +39,7 @@ const globalForApp = globalThis as unknown as { app: typeof slackApp };
 
 const app = globalForApp.app || slackApp;
 
-if (process.env.NODE_ENV !== "production") globalForApp.app = slackApp;
+globalForApp.app = slackApp;
 
 const startBot = async () => {
   if (getBotStatus() === "On") {
