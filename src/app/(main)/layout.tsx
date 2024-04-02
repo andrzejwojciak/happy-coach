@@ -7,10 +7,10 @@ export default function MainLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="w-full h-full bg-white text-black flex flex-col">
+    <div className="w-full min-h-full bg-white text-black flex flex-col justify-between">
       <Navbar />
-      <div className="h-full flex flex-row justify-center pt-10">
-        <div className="w-800">{children}</div>
+      <div className="h-full flex-1 flex justify-center  pt-6">
+        <div className="w-800 ">{children}</div>
       </div>
       <Footer />
     </div>

@@ -1,7 +1,7 @@
 import {
   getCurrentUserOverallActivitiesSummary,
   getOverallActivitiesSummary,
-} from "@/src/lib/services/recordsService";
+} from "@/src/lib/services/recordService";
 import Chart from "@/src/components/home/chart";
 
 export default async function OverallActivitySummary() {

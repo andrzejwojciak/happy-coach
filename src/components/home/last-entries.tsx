@@ -1,4 +1,4 @@
-import { getLastEntries } from "@/src/lib/services/recordsService";
+import { getLastEntries } from "@/src/lib/services/recordService";
 import { Unit } from "@/src/lib/types/enums/Unit";
 import Image from "next/image";
 
@@ -24,7 +24,7 @@ export default async function LastEntires() {
   const lastEntires = await getLastEntries(10);
   return (
     <div className=" ">
-      Last entires goes here:
+      Last entires go here:
       {lastEntires.map((lastEntry) => {
         const unit = lastEntry.unit === Unit.Kilometers ? "km" : "h";
         return (

@@ -2,7 +2,7 @@ import { AbstractHandler } from "@/src/bot/handlers/handler";
 import { HandleResult } from "@/src/bot/types/handleResult";
 import { Message } from "@/src/bot/types/message";
 import { RecordService } from "@/src/bot/services/recordService";
-import { getOrCreateUserById } from "@/src/lib/services/userService";
+import { getOrCreateUserById } from "@/src/lib/services/usersService";
 
 export default class NoEventCommandHandler extends AbstractHandler {
   public async handle(request: Message): Promise<HandleResult | null> {

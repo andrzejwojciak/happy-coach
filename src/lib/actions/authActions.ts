@@ -5,7 +5,7 @@ import {
   createUser,
   getUserByCredentials,
   getUserByEmail,
-} from "@/src/lib/services/userService";
+} from "@/src/lib/services/usersService";
 import { v4 as uuid } from "uuid";
 import { DataResult, Result } from "@/src/lib/types/Result";
 import { RegisterModel } from "@/src/lib/types/RegisterModel";
