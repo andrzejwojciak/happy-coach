@@ -92,8 +92,6 @@ export default function RegisterPage() {
   }
 
   async function finishSignUp(event: React.FormEvent) {
-    console.log(inputValue);
-
     if (!inputValue?.password) return;
 
     const response = await finishSignUpAction({

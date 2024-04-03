@@ -122,8 +122,6 @@ export async function login({
   login: string;
   password: string;
 }): Promise<DataResult<string>> {
-  if (login === "checking") console.log(getCache(password));
-
   const user = await getUserByCredentials(login, password);
 
   if (!user) return { success: false, errorMessage: "Wrong login or password" };

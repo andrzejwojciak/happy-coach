@@ -15,7 +15,6 @@ export default function Users() {
   function loadUsers() {
     getUsers({ page: 0, perPage: 100 }).then((users) => {
       setGridData(users.data);
-      console.log("zaladowanie!");
     });
   }
 
