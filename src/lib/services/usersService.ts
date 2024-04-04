@@ -58,9 +58,10 @@ export async function getUserByCredentials(
 
   if (!user || !user.password_hash) return null;
 
-  if (!isPasswordMatching(user.password_hash, password)) return null;
+  if ((await isPasswordMatching(user.password_hash, password)) === true)
+    return user as User;
 
-  return user as User;
+  return null;
 }
 
 export async function createUser({
