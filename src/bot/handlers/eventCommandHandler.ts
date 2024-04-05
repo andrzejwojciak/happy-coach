@@ -5,6 +5,7 @@ import { Message } from "@/src/bot/types/message";
 import { HandleResult } from "@/src/bot/types/handleResult";
 import { CreateEventDetails } from "@/src/bot/services/models/createEventModel";
 import { Event } from "@/src/bot/services/models/Event";
+import { getOrCreateUserById } from "@/src/lib/services/usersService";
 
 export default class EventCommandHandler extends AbstractHandler {
   private eventService!: EventService;
@@ -46,6 +47,8 @@ export default class EventCommandHandler extends AbstractHandler {
       request.user,
       this.event
     );
+
+    const user = await getOrCreateUserById(request.user);
 
     return {
       text: result,
