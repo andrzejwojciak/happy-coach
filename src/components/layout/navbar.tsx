@@ -22,6 +22,7 @@ export default async function Navbar() {
               alt="HappyCoach logo"
               width={110}
               height={68.5}
+              unoptimized
             />
           </Link>
         </div>

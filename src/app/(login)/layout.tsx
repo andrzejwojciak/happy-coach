@@ -16,6 +16,7 @@ export default function LoginLayout({
               alt="HappyCoach logo"
               width={300}
               height={300}
+              unoptimized
             />
           </Link>
         </div>
