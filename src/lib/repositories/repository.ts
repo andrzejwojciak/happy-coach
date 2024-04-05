@@ -49,34 +49,6 @@ export const GetEventAsync = async (
   return null;
 };
 
-export const SaveEvent = async (event: {
-  eventName: string;
-  channelId: string;
-  themeId: number | null;
-  ends_at: Date;
-  pointsForKilometre: number;
-  pointsForHour: number;
-  totalPointsToScore: number;
-}) => {
-  await prismaClient.event.create({
-    data: event,
-  });
-};
-
-export const SaveEventAsync = async (event: {
-  channelId: string;
-  created_at: Date;
-  ends_at: Date;
-  eventName: string;
-  pointsForHour: number;
-  pointsForKilometre: number;
-  totalPointsToScore: number;
-}) => {
-  await prismaClient.event.create({
-    data: event,
-  });
-};
-
 export const saveRecordAsync = async (
   userId: string,
   message: string,

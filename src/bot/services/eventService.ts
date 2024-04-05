@@ -1,14 +1,10 @@
 import {
   GetEventAsync,
   GetTotalScore,
-  SaveEvent,
-  SaveEventAsync,
   saveRecordAsync,
 } from "@/src/lib/repositories/repository";
 import { RecordService } from "@/src/bot/services/recordService";
-import { CreateEventDetails } from "@/src/bot/services/models/createEventModel";
 import { Event } from "@/src/bot/services/models/Event";
-import { HandleResult } from "@/src/bot/types/handleResult";
 import { Unit } from "@/src/bot/services/models/unit";
 import { ResultItem } from "@/src/bot/services/models/resultItemModel";
 
@@ -22,26 +18,6 @@ export class EventService {
   public async GetEventAsync(channelId: string): Promise<Event | null> {
     const event = await GetEventAsync(channelId);
     return event as Event;
-  }
-
-  public async SaveEventAsync(
-    createEventModel: CreateEventDetails
-  ): Promise<HandleResult | null> {
-    const event = {
-      channelId: createEventModel.channelId,
-      created_at: new Date(),
-      ends_at: new Date(createEventModel.endsAt),
-      eventName: createEventModel.name,
-      pointsForHour: createEventModel.pointsForHour,
-      pointsForKilometre: createEventModel.pointsForKilometre,
-      totalPointsToScore: createEventModel.totalPointsToScore,
-    };
-
-    await SaveEventAsync(event);
-
-    return {
-      text: `Event ${createEventModel.name} started! Good luck everyone! :crossed_fingers::skin-tone-2:`,
-    };
   }
 
   public async addRecordsAsync(
@@ -126,7 +102,8 @@ export class EventService {
     pointsScored: Number
   ): Promise<string> {
     event.finished = true;
-    await SaveEvent(event);
+    // TODO:
+    // await SaveEvent(event);
 
     return `Congratulations on completing the ${event.eventName} event! You scored ${pointsScored} points,
     finishing before the time ran out. Great job!`;
