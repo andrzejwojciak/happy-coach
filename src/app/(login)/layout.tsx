@@ -12,11 +12,10 @@ export default function LoginLayout({
         <div className="flex justify-center">
           <Link href="/">
             <Image
-              src="/happy-coach-logo-black.png"
+              src="/images/happy-coach-logo-black.png"
               alt="HappyCoach logo"
               width={300}
               height={300}
-              unoptimized
             />
           </Link>
         </div>

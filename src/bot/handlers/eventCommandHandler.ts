@@ -41,14 +41,14 @@ export default class EventCommandHandler extends AbstractHandler {
   private async addEntiresToEvent(
     request: Message
   ): Promise<HandleResult | null> {
+    const user = await getOrCreateUserById(request.user);
+
     const result = await this.eventService.addRecordsAsync(
       JSON.stringify(request),
       request.text,
-      request.user,
+      user.id,
       this.event
     );
-
-    const user = await getOrCreateUserById(request.user);
 
     return {
       text: result,
