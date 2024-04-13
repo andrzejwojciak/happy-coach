@@ -29,9 +29,9 @@ export async function createEvent(
   }
 
   event.themeId = Number(theme?.id ?? event.themeId);
-  const newEvent = await createEventServiceMethod(event);
+  const newEventId = await createEventServiceMethod(event);
 
-  if (!newEvent) return { success: false };
+  if (!newEventId) return { success: false };
 
   const currentUser = await getCurrentUser();
 
@@ -47,7 +47,7 @@ export async function createEvent(
     Good luck! :muscle::skin-tone-2:`,
   });
 
-  return newEvent
+  return newEventId
     ? { success: true }
     : { success: false, errorMessage: "Something went wrong!" };
 }

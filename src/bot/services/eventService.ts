@@ -7,6 +7,7 @@ import { RecordService } from "@/src/bot/services/recordService";
 import { Event } from "@/src/bot/services/models/Event";
 import { Unit } from "@/src/bot/services/models/unit";
 import { ResultItem } from "@/src/bot/services/models/resultItemModel";
+import { finishEvent as finishEventMethod } from "@/src/lib/services/eventsService";
 
 export class EventService {
   private readonly recordService: RecordService;
@@ -101,9 +102,7 @@ export class EventService {
     event: Event,
     pointsScored: Number
   ): Promise<string> {
-    event.finished = true;
-    // TODO:
-    // await SaveEvent(event);
+    await finishEventMethod(event.id);
 
     return `Congratulations on completing the ${event.eventName} event! You scored ${pointsScored} points,
     finishing before the time ran out. Great job!`;

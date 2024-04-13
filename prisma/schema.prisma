@@ -17,8 +17,9 @@ model event {
   pointsForHour      Int
   totalPointsToScore Int
   finished           Boolean  @default(false)
+  finished_at        DateTime?
   themeId            Int?
-  theme              Theme?    @relation(fields: [themeId], references: [id])
+  theme              Theme?   @relation(fields: [themeId], references: [id])
 }
 
 model event_records {

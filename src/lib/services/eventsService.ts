@@ -82,7 +82,7 @@ export async function getEvents(
   });
 }
 
-export async function createEvent(event: Event) {
+export async function createEvent(event: Event): Promise<number> {
   const newEvent = await prismaClient.event.create({
     data: {
       eventName: event.eventName,
@@ -97,5 +97,19 @@ export async function createEvent(event: Event) {
     },
   });
 
-  return newEvent;
+  return newEvent.id;
+}
+
+export async function finishEvent(eventId: number): Promise<void> {
+  await prismaClient.event.update({
+    where: {
+      id: eventId,
+    },
+    data: {
+      finished: true,
+      finished_at: new Date(),
+    },
+  });
+
+  return;
 }

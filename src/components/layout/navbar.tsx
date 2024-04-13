@@ -18,7 +18,7 @@ export default async function Navbar() {
         <div>
           <Link href="/">
             <Image
-              src="/images/happy-coach-logo-black.png"
+              src="/images/happy-coach-logo-black.webp"
               alt="HappyCoach logo"
               width={110}
               height={68.5}
