@@ -84,12 +84,9 @@ export default function CreateEventForm() {
 
   return (
     <div>
-      <div className="text-orange-500 font-light">
-        Caution: you can use it but be careful - no validation added yet
-      </div>
       <form onSubmit={handleSubmit} className="flex flex-col">
-        <label>
-          Event Name:
+        <div className="flex mb-1">
+          <label className="block w-48">Event Name:</label>
           <input
             className="ml-2 p-1 border-2 rounded-lg"
             type="text"
@@ -97,9 +94,9 @@ export default function CreateEventForm() {
             value={eventFormData.eventName}
             onChange={handleChange}
           />
-        </label>
-        <label>
-          Ends at:
+        </div>
+        <div className="flex mb-1">
+          <label className="block w-48">Ends at:</label>
           <input
             className="ml-2 p-1 border-2 rounded-lg"
             type="date"
@@ -107,9 +104,9 @@ export default function CreateEventForm() {
             value={dateToIsoString(eventFormData.endsAt ?? new Date())}
             onChange={handleChange}
           />
-        </label>
-        <label>
-          Points for Kilometer:
+        </div>
+        <div className="flex mb-1">
+          <label className="block w-48">Points for Kilometer:</label>
           <input
             className="ml-2 p-1 border-2 rounded-lg"
             type="number"
@@ -117,9 +114,9 @@ export default function CreateEventForm() {
             value={eventFormData.pointsForKilometer}
             onChange={(event) => handleChange(event, true)}
           />
-        </label>
-        <label>
-          Points for Hour:
+        </div>
+        <div className="flex mb-1">
+          <label className="block w-48">Points for Hour:</label>
           <input
             className="ml-2 p-1 border-2 rounded-lg"
             type="number"
@@ -127,9 +124,9 @@ export default function CreateEventForm() {
             value={eventFormData.pointsForHour}
             onChange={(event) => handleChange(event, true)}
           />
-        </label>
-        <label>
-          Total Points to Score:
+        </div>
+        <div className="flex mb-1">
+          <label className="block w-48">Total Points to Score:</label>
           <input
             className="ml-2 p-1 border-2 rounded-lg"
             type="number"
@@ -137,7 +134,7 @@ export default function CreateEventForm() {
             value={eventFormData.totalPointsToScore}
             onChange={(event) => handleChange(event, true)}
           />
-        </label>
+        </div>
         Theme:
         <div className="">
           <div className="flex flex-row">
