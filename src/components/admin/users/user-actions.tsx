@@ -32,7 +32,7 @@ export default function UserActions({
         className="rounded-lg p-1 bg-orange-500 hover:bg-sky-800 text-white mb-2"
         onClick={switchIsAdmin}
       >
-        {!user.isAdmin ? "Add admin" : "Remove admin"}
+        {!user.isAdmin ? "Make admin" : "Remove rights"}
       </button>
       <div className="flex flex-row justify-between">
         {user.dataFetched ? null : (
