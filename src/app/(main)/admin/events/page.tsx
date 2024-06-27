@@ -1,5 +1,5 @@
 import { Event } from "@/src/lib/models/Event";
-import { getEvents } from "@/src/lib/actions/eventsActions";
+import { getEventsAction } from "@/src/lib/actions/eventsActions";
 import {
   PlusIcon,
   PencilSquareIcon,
@@ -9,7 +9,7 @@ import Link from "next/link";
 import clsx from "clsx";
 
 export default async function Events() {
-  const events: Event[] = await getEvents({ page: 0, perPage: 100 });
+  const events: Event[] = await getEventsAction({ page: 0, perPage: 100 });
 
   return (
     <div>

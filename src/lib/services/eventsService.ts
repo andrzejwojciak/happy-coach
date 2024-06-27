@@ -113,3 +113,79 @@ export async function finishEvent(eventId: number): Promise<void> {
 
   return;
 }
+
+export async function getEventByName(name: string): Promise<Event | null> {
+  noStore();
+
+  const event = await prismaClient.event.findFirst({
+    where: {
+      eventName: name,
+    },
+    include: {
+      theme: true,
+    },
+  });
+
+  return event === null
+    ? null
+    : {
+        id: event.id,
+        channelId: event.channelId,
+        eventName: event.eventName,
+        createdAt: event.created_at,
+        endsAt: event.ends_at,
+        pointsForKilometer: event.pointsForKilometre,
+        pointsForHour: event.pointsForHour,
+        totalPointsToScore: event.totalPointsToScore,
+        finished: event.finished,
+        themeId: event.themeId ?? undefined,
+        theme:
+          event.themeId !== null && event.theme !== null
+            ? {
+                id: event.theme.id,
+                name: event.theme.name,
+                start: event.theme.start,
+                finish: event.theme.finish,
+                pawn: event.theme.pawn,
+              }
+            : undefined,
+      };
+}
+
+export async function getEventById(id: number): Promise<Event | null> {
+  noStore();
+
+  const event = await prismaClient.event.findFirst({
+    where: {
+      id: id,
+    },
+    include: {
+      theme: true,
+    },
+  });
+
+  return event === null
+    ? null
+    : {
+        id: event.id,
+        channelId: event.channelId,
+        eventName: event.eventName,
+        createdAt: event.created_at,
+        endsAt: event.ends_at,
+        pointsForKilometer: event.pointsForKilometre,
+        pointsForHour: event.pointsForHour,
+        totalPointsToScore: event.totalPointsToScore,
+        finished: event.finished,
+        themeId: event.themeId ?? undefined,
+        theme:
+          event.themeId !== null && event.theme !== null
+            ? {
+                id: event.theme.id,
+                name: event.theme.name,
+                start: event.theme.start,
+                finish: event.theme.finish,
+                pawn: event.theme.pawn,
+              }
+            : undefined,
+      };
+}
