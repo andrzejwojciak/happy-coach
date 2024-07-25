@@ -100,6 +100,24 @@ export async function createEvent(event: Event): Promise<number> {
   return newEvent.id;
 }
 
+export async function updateEvent(eventToUpdate: Event): Promise<boolean> {
+  var event = await prismaClient.event.update({
+    where: {
+      id: eventToUpdate.id,
+    },
+    data: {
+      eventName: eventToUpdate.eventName,
+      ends_at: eventToUpdate.endsAt,
+      pointsForHour: eventToUpdate.pointsForHour,
+      pointsForKilometre: eventToUpdate.pointsForKilometer,
+      totalPointsToScore: eventToUpdate.totalPointsToScore,
+      themeId: eventToUpdate.themeId,
+    },
+  });
+
+  return event !== null;
+}
+
 export async function finishEvent(eventId: number): Promise<void> {
   await prismaClient.event.update({
     where: {

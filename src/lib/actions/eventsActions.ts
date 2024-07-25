@@ -6,7 +6,9 @@ import { PaginationRequest } from "@/src/lib/types/PaginationRequest";
 import {
   getEvents,
   createEvent,
+  updateEvent,
   getEventByName,
+  getEventById,
 } from "@/src/lib/services/eventsService";
 import { createTheme } from "@/src/lib/services/themeService";
 import { Result } from "@/src/lib/types/Result";
@@ -19,6 +21,15 @@ export async function getEventsAction(
 ): Promise<Event[]> {
   const events = await getEvents(pagination);
   return events;
+}
+
+// TODO: Add validation for eventId
+export async function getEventByIdAction(
+  eventId: number
+): Promise<Event | null> {
+  if (typeof eventId !== "number") return null;
+  const event = await getEventById(eventId);
+  return event;
 }
 
 export async function createEventAction(
@@ -60,5 +71,34 @@ export async function createEventAction(
 
   return newEventId
     ? redirect(`${newEventId}`)
+    : { success: false, errorMessage: "Something went wrong!" };
+}
+
+export async function updateEventAction(
+  event: Event,
+  theme?: Theme
+): Promise<Result> {
+  const eventExists = await getEventById(event.id);
+
+  if (eventExists === null) {
+    return {
+      success: false,
+      errorMessage: "Event with this id does not exist",
+    };
+  }
+
+  if (theme) {
+    theme = await createTheme(theme);
+  }
+
+  event.themeId = Number(theme?.id ?? event.themeId);
+
+  const updatedEvent = await updateEvent(event);
+
+  if (!updatedEvent)
+    return { success: false, errorMessage: "Something went wrong!" };
+
+  return updatedEvent
+    ? { success: true }
     : { success: false, errorMessage: "Something went wrong!" };
 }

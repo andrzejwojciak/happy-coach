@@ -1,7 +1,7 @@
 "use client";
 
 import { Event } from "@/src/lib/models/Event";
-import { createEventAction } from "@/src/lib/actions/eventsActions";
+import { updateEventAction } from "@/src/lib/actions/eventsActions";
 import { useEffect, useState } from "react";
 import { ArrowUturnLeftIcon } from "@heroicons/react/16/solid";
 import { getThemesAction } from "@/src/lib/actions/themesActions";
@@ -9,18 +9,8 @@ import Link from "next/link";
 import { Theme } from "@/src/lib/models/Theme";
 import clsx from "clsx";
 
-export default function CreateEvent() {
-  const [eventFormData, setEventFormData] = useState<Event>({
-    id: 0,
-    channelId: "",
-    eventName: "",
-    createdAt: new Date(),
-    endsAt: new Date(),
-    pointsForKilometer: 21,
-    pointsForHour: 37,
-    totalPointsToScore: 420,
-    finished: false,
-  });
+export default function EditEvent({ event }: { event: Event }) {
+  const [eventFormData, setEventFormData] = useState<Event>(event);
   const [themeCreateMode, setThemeCreateMode] = useState<boolean>(false);
   const [themeFormData, setThemeFormData] = useState<Theme>({
     id: 0,
@@ -30,6 +20,10 @@ export default function CreateEvent() {
     pawn: "",
   });
   const [themes, setThemes] = useState<Theme[]>();
+  const [resultMessage, setResultMessages] = useState<{
+    success: Boolean;
+    message: string;
+  }>();
 
   const handleThemeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -48,13 +42,19 @@ export default function CreateEvent() {
     getThemesAction().then((themes) => setThemes(themes));
   }, []);
 
-  const [errors, setErrors] = useState<string>();
-
   const handleChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-    isNumber: boolean = false
+    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    let { name, value } = event.target;
+    let { name, value, type } = event.target;
+
+    if (name === "finished") {
+      setEventFormData({
+        ...eventFormData,
+        [name]: value.toLowerCase() === "true",
+      });
+
+      return;
+    }
 
     if (name === "endsAt") {
       value = value + "T23:59:59.000Z";
@@ -62,15 +62,23 @@ export default function CreateEvent() {
 
     setEventFormData({
       ...eventFormData,
-      [name]: isNumber ? Number(value) : value,
+      [name]: type === "number" ? Number(value) : value,
     });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    createEventAction(eventFormData, undefined).then((response) => {
-      if (response && !response.success) setErrors(response.errorMessage);
+    updateEventAction(
+      eventFormData,
+      themeCreateMode ? themeFormData : undefined
+    ).then((response) => {
+      if (response && !response.success)
+        setResultMessages({
+          success: false,
+          message: response?.errorMessage ?? "something went wrong",
+        });
+      else setResultMessages({ success: true, message: "Event updated" });
     });
   };
 
@@ -83,9 +91,31 @@ export default function CreateEvent() {
     <div>
       <form onSubmit={handleSubmit} className="flex flex-col">
         <div className="flex mb-1">
+          <label className="block w-48">Id:</label>
+          <input
+            className="ml-2 p-1 border-2 rounded-lg w-44"
+            type="text"
+            name="eventName"
+            value={eventFormData.id}
+            disabled
+          />
+        </div>
+        <div className="flex mb-1">
+          <label className="block w-48">Status:</label>
+          <select
+            className="ml-2 p-1 border-2 rounded-lg w-44"
+            name="finished"
+            value={eventFormData.finished.toString()}
+            onChange={handleChange}
+          >
+            <option value="true">Finished</option>
+            <option value="false">Unfinished</option>
+          </select>
+        </div>
+        <div className="flex mb-1">
           <label className="block w-48">Event Name:</label>
           <input
-            className="ml-2 p-1 border-2 rounded-lg"
+            className="ml-2 p-1 border-2 rounded-lg w-44"
             type="text"
             name="eventName"
             value={eventFormData.eventName}
@@ -95,7 +125,7 @@ export default function CreateEvent() {
         <div className="flex mb-1">
           <label className="block w-48">Ends at:</label>
           <input
-            className="ml-2 p-1 border-2 rounded-lg"
+            className="ml-2 p-1 border-2 rounded-lg w-44"
             type="date"
             name="endsAt"
             value={dateToDateString(eventFormData.endsAt ?? new Date())}
@@ -105,31 +135,31 @@ export default function CreateEvent() {
         <div className="flex mb-1">
           <label className="block w-48">Points for Kilometer:</label>
           <input
-            className="ml-2 p-1 border-2 rounded-lg"
+            className="ml-2 p-1 border-2 rounded-lg w-44"
             type="number"
             name="pointsForKilometer"
             value={eventFormData.pointsForKilometer}
-            onChange={(event) => handleChange(event, true)}
+            onChange={(event) => handleChange(event)}
           />
         </div>
         <div className="flex mb-1">
           <label className="block w-48">Points for Hour:</label>
           <input
-            className="ml-2 p-1 border-2 rounded-lg"
+            className="ml-2 p-1 border-2 rounded-lg w-44"
             type="number"
             name="pointsForHour"
             value={eventFormData.pointsForHour}
-            onChange={(event) => handleChange(event, true)}
+            onChange={(event) => handleChange(event)}
           />
         </div>
         <div className="flex mb-1">
           <label className="block w-48">Total Points to Score:</label>
           <input
-            className="ml-2 p-1 border-2 rounded-lg"
+            className="ml-2 p-1 border-2 rounded-lg w-44"
             type="number"
             name="totalPointsToScore"
             value={eventFormData.totalPointsToScore}
-            onChange={(event) => handleChange(event, true)}
+            onChange={(event) => handleChange(event)}
           />
         </div>
         Theme:
@@ -229,14 +259,21 @@ export default function CreateEvent() {
             </div>
           </div>
         </>
-        <div className="text-rose-600 font-bold">{errors}</div>
+        <div
+          className={clsx("font-bold", {
+            "text-rose-600": !resultMessage?.success,
+            "text-green-600": resultMessage?.success,
+          })}
+        >
+          {resultMessage?.message}
+        </div>
         <div className="flex flex-row place-items-end">
           <div>
             <button
               type="submit"
               className="bg-green-500 w-32 text-white p-2 rounded-lg hover:bg-green-600 mt-4"
             >
-              Create event
+              Update event
             </button>
           </div>
           <div>
