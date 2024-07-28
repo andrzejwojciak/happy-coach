@@ -29,20 +29,18 @@ export default function UserActions({
   return (
     <div className="flex flex-col">
       <button
-        className="rounded-lg p-1 bg-orange-500 hover:bg-sky-800 text-white mb-2"
+        className="rounded-lg p-1 bg-green-500 hover:bg-sky-800 text-white mb-2"
         onClick={switchIsAdmin}
       >
         {!user.isAdmin ? "Make admin" : "Remove rights"}
       </button>
       <div className="flex flex-row justify-between">
-        {user.dataFetched ? null : (
-          <button
-            className="rounded-lg p-1 bg-blue-500 hover:bg-sky-800 text-white mb-2 h-10 w-10"
-            onClick={fetchUserData}
-          >
-            <ArrowDownOnSquareIcon />
-          </button>
-        )}
+        <button
+          className="rounded-lg p-1 bg-blue-500 hover:bg-sky-800 text-white mb-2 h-10 w-10"
+          onClick={fetchUserData}
+        >
+          <ArrowDownOnSquareIcon />
+        </button>
         <button className="rounded-lg p-1 bg-red-500 hover:bg-sky-800 text-white h-10 w-10">
           <TrashIcon />
         </button>

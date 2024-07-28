@@ -126,13 +126,19 @@ export async function getSynchronizedUserData(
 
   if (!fetchedUser.ok) return null;
 
+  console.log(fetchedUser);
+
   const updatedUser = await prismaClient.user.update({
     where: {
       id: userId,
     },
     data: {
       email: fetchedUser.user?.profile?.email,
-      display_name: fetchedUser.user?.profile?.display_name,
+      display_name:
+        fetchedUser.user?.profile?.display_name ??
+        fetchedUser.user?.profile?.real_name ??
+        fetchedUser.user?.name ??
+        fetchedUser.user?.profile?.email,
       image_24: fetchedUser.user?.profile?.image_24,
       image_32: fetchedUser.user?.profile?.image_32,
       image_48: fetchedUser.user?.profile?.image_48,
