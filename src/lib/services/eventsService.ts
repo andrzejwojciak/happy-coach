@@ -2,6 +2,8 @@ import { prismaClient } from "@/src/lib/data/client";
 import { PaginationRequest } from "@/src/lib//types/PaginationRequest";
 import { unstable_noStore as noStore } from "next/cache";
 import { Event } from "@/src/lib/models/Event";
+import { EventDetails } from "../models/EventDetails";
+import { Participant } from "../models/Participant";
 
 export async function getEventByChannelId(
   channelId: string
@@ -110,6 +112,7 @@ export async function updateEvent(eventToUpdate: Event): Promise<boolean> {
       ends_at: eventToUpdate.endsAt,
       pointsForHour: eventToUpdate.pointsForHour,
       pointsForKilometre: eventToUpdate.pointsForKilometer,
+      finished: eventToUpdate.finished,
       totalPointsToScore: eventToUpdate.totalPointsToScore,
       themeId: eventToUpdate.themeId,
     },
@@ -206,4 +209,77 @@ export async function getEventById(id: number): Promise<Event | null> {
               }
             : undefined,
       };
+}
+
+export async function getEventDetailsById(
+  id: number
+): Promise<EventDetails | null> {
+  noStore();
+  const event = await getEventById(id);
+  if (!event) return null;
+
+  const participantsResults = await prismaClient.$queryRaw<any[]>`   
+SELECT 
+    "User".id,
+    "User".email,
+    "User".image_24,
+    "User".display_name,
+    SUM(CASE WHEN record.activity = 'time' THEN record."value" ELSE 0 END) AS time,
+    SUM(CASE WHEN record.activity = 'distance' THEN record."value" ELSE 0 END) AS distance,
+    COUNT(DISTINCT event_records.id) AS user_event_record_count,
+    tc.total_records
+FROM 
+    event_records
+JOIN 
+    record ON event_records."recordId" = record.id
+JOIN 
+    "User" on record."userId" = "User".id
+CROSS JOIN 
+    (SELECT COUNT(*) AS total_records FROM event_records WHERE "eventId" = ${id}) tc
+WHERE 
+    event_records."eventId" = ${id}
+GROUP BY 
+    "User".id, "User".email, "User".image_24, "User".display_name, tc.total_records
+ORDER BY 
+    "User".id;`;
+
+  let hoursCount = 0;
+  let kilometersCount = 0;
+  let participants: Participant[] = [];
+
+  participantsResults.forEach((result) => {
+    const participant = {
+      id: result.id,
+      avatarUrl: result.image_24,
+      name: result.display_name,
+      email: result.email,
+      fullName: result.display_name,
+      pointsCount:
+        result.time * event.pointsForHour +
+        result.distance * event.pointsForKilometer,
+      kilometersCount: result.time,
+      hoursCount: result.distance,
+      entiresCount: Number(result.user_event_record_count),
+    };
+    participants.push(participant);
+
+    hoursCount += result.time;
+    kilometersCount += result.distance;
+  });
+
+  const pointsCount =
+    hoursCount * event.pointsForHour +
+    kilometersCount * event.pointsForKilometer;
+
+  return {
+    event: event,
+    participants: participants,
+    kilometersCount: kilometersCount,
+    hoursCount: hoursCount,
+    pointsCount: pointsCount,
+    entiresCount:
+      participantsResults.length > 0
+        ? Number(participantsResults[0].total_records)
+        : 0,
+  };
 }

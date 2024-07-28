@@ -2,6 +2,7 @@
 
 import { Event } from "@/src/lib/models/Event";
 import { Theme } from "@/src/lib/models/Theme";
+import { EventDetails } from "@/src/lib/models/EventDetails";
 import { PaginationRequest } from "@/src/lib/types/PaginationRequest";
 import {
   getEvents,
@@ -9,6 +10,7 @@ import {
   updateEvent,
   getEventByName,
   getEventById,
+  getEventDetailsById,
 } from "@/src/lib/services/eventsService";
 import { createTheme } from "@/src/lib/services/themeService";
 import { Result } from "@/src/lib/types/Result";
@@ -101,4 +103,11 @@ export async function updateEventAction(
   return updatedEvent
     ? { success: true }
     : { success: false, errorMessage: "Something went wrong!" };
+}
+
+export async function getEventDetailsByIdAction(
+  eventId: number
+): Promise<EventDetails | null> {
+  const EventDetails = await getEventDetailsById(eventId);
+  return EventDetails;
 }
