@@ -4,7 +4,6 @@ import {
   getOverallActivitiesSummary,
 } from "@/src/lib/services/recordService";
 import clsx from "clsx";
-import { In } from "@heroicons/react/16/solid";
 
 function EventStatus(finished: boolean, endsAt: Date): string {
   return finished

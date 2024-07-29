@@ -32,23 +32,30 @@ export class RecordService {
     message: string,
     userId: string
   ): Promise<string> => {
+    console.log("ELO");
+
     const distance = this.getNumbersFromMessage(message, "km");
     const hours = this.getNumbersFromMessage(message, "h");
     this.getNumbersFromMessage(message, "min").forEach((minute) =>
       hours.push(minute / 60)
     );
 
+    console.log("distance", distance);
+    console.log("hours", hours);
+
     let responseMessage: string = "";
 
     if (hours.length) {
       await this.saveRecord(userId, logMessage, "time", hours);
       const sum = await this.getCurrentValues("time");
+      console.log("time sum", sum);
       responseMessage += this.prepareMessage(hours, sum, "h");
     }
 
     if (distance.length) {
       await this.saveRecord(userId, logMessage, "distance", distance);
       const sum = await this.getCurrentValues("distance");
+      console.log("distance sum", sum);
       responseMessage += "\n" + this.prepareMessage(distance, sum, "km");
     }
 

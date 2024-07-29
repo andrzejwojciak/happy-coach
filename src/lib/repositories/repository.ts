@@ -99,7 +99,7 @@ export const GetTotalScore = async (eventId: number) => {
 export const getCurrentValues = async (activity: string): Promise<number> => {
   const result = await prismaClient.record.aggregate({
     where: {
-      activity: "distance",
+      activity: activity,
     },
     _sum: {
       value: true,

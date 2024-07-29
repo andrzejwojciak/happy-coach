@@ -7,7 +7,6 @@ import { getOrCreateUserById } from "@/src/lib/services/usersService";
 export default class NoEventCommandHandler extends AbstractHandler {
   public async handle(request: Message): Promise<HandleResult | null> {
     if (request.bot_id) return super.handle(request);
-    console.log("NoEventCommandHandler executed");
 
     switch (true) {
       case new RegExp(

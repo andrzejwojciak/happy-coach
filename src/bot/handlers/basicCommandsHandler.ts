@@ -4,11 +4,9 @@ import { AbstractHandler } from "@/src/bot/handlers/handler";
 
 export default class BasicCommandsHandler extends AbstractHandler {
   public async handle(request: Message): Promise<HandleResult | null> {
-    console.log("BasicCommandsHandler executed");
-
     switch (true) {
       case new RegExp(/^(happycoach|HappyCoach|Coach) (version|-v)$/).test(
-        request.text,
+        request.text
       ):
         return this.versionCommand(request);
       case request.text === "ping":

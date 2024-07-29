@@ -12,8 +12,6 @@ export default class EventCommandHandler extends AbstractHandler {
   private event!: Event;
 
   public async handle(request: Message): Promise<HandleResult | null> {
-    console.log("EventCommandHandler executed");
-
     this.eventService = new EventService();
     const event = await this.eventService.GetEventAsync(request.channel);
 
