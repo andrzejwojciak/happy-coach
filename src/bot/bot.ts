@@ -42,12 +42,12 @@ const app = globalForApp.app || slackApp;
 globalForApp.app = slackApp;
 
 const startBot = async () => {
-  if (getBotStatus() === "On") {
+  if (getBotStatus() === true) {
     return;
   }
   await app.start();
 
-  setBotStatus("On");
+  setBotStatus(true);
   await app.client.chat.postMessage({
     channel: process.env.MAIN_CHANNEL ?? "",
     text: "Hey everyone! I'm back and eager to hear about your achievements today :muscle: I'm all ears!",
@@ -55,31 +55,31 @@ const startBot = async () => {
 };
 
 const stopBot = async () => {
-  if (getBotStatus() === "Off") {
+  if (getBotStatus() === false) {
     return;
   }
   await app.stop();
 
-  setBotStatus("Off");
+  setBotStatus(false);
   await app.client.chat.postMessage({
     channel: process.env.MAIN_CHANNEL ?? "",
     text: "Someone shut me down. Don't post anything until I'm back :pray:",
   });
 };
 
-const getBotStatus = (): string => {
+const getBotStatus = (): boolean => {
   let status = getCache("bot-status");
 
   if (!status) {
-    status = { value: "Off" };
+    status = { value: false.toString() };
     saveCache("bot-status", status);
   }
 
-  return status.value;
+  return status.value === "true";
 };
 
-const setBotStatus = (value: string) => {
-  saveCache("bot-status", { value: value });
+const setBotStatus = (status: boolean) => {
+  saveCache("bot-status", { value: status.toString() });
 };
 
 export { startBot, stopBot, getBotStatus as botStatus, app as slackApp };

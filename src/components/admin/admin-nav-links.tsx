@@ -10,8 +10,7 @@ const links = [
     href: "/admin",
   },
   { name: "Users", href: "/admin/users" },
-  { name: "Events", href: "/admin/events" },
-  { name: "Settings", href: "/admin/settings" },
+  { name: "Challenges", href: "/admin/events" },
   { name: "Logs", href: "/admin/logs" },
 ];
 
