@@ -1,3 +1,30 @@
+/* eslint-disable react/no-unescaped-entities */
+import Image from "next/image";
+
 export default function About() {
-  return <>Something about</>;
+  return (
+    <>
+      Something about <br></br> src="/images/happy-coach-logo-black.webp"
+      <Image
+        src="/images/happy-coach-logo-black.webp"
+        alt="HappyCoach logo"
+        width={300}
+        height={300}
+      />
+      src="/images/happy-coach-logo-black.png"
+      <Image
+        src="/images/happy-coach-logo-black.png"
+        alt="HappyCoach logo"
+        width={300}
+        height={300}
+      />
+      src="https://i.imgur.com/HpCMeLx.png"
+      <Image
+        src="https://i.imgur.com/HpCMeLx.png"
+        alt="HappyCoach logo"
+        width={300}
+        height={300}
+      />
+    </>
+  );
 }

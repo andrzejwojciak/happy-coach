@@ -102,7 +102,7 @@ export async function getLastEntries(
       userId: recentRecord.userId,
       avatar:
         !isLogged || recentRecord.user.image_72 === null
-          ? "/images/default-slack-avatar.webp"
+          ? "https://pbs.twimg.com/media/EWAJB4WUcAAje8s.png"
           : recentRecord.user.image_72,
       username:
         "@" +

@@ -82,7 +82,7 @@ export default async function OverallActivitySummary() {
                       x/{event.totalPointsToScore} points scored
                     </div>
                   </div>
-                  <div className="flex flex-row">
+                  <div className="flex flex-row ml-16">
                     <div
                       className={clsx("rounded-md py-1 px-2 text-white", {
                         "bg-blue-500":
