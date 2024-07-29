@@ -23,8 +23,15 @@ export default async function LastEntires() {
   const currentTime = new Date().getTime();
   const lastEntires = await getLastEntries(10);
   return (
-    <div className=" ">
-      Last entires go here:
+    <div>
+      <div className="flex justify-center text-xs mb-1">
+        <div className="bg-slate-200 rounded-md text-black p-1 px-2">
+          Recent Activity
+        </div>
+      </div>
+      <div className="text-2xl text-center mb-2 font-sans">
+        Our latests entires
+      </div>
       {lastEntires.map((lastEntry) => {
         const unit = lastEntry.unit === Unit.Kilometers ? "km" : "h";
         return (

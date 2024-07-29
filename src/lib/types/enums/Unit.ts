@@ -1,5 +1,5 @@
 export enum Unit {
   Default = "default",
-  Kilometers = "kilometers",
-  Hours = "hours",
+  Kilometers = "km",
+  Hours = "h",
 }

@@ -137,8 +137,9 @@ export default async function EventCard({
                 <div className="font-bold text-2xl">
                   {eventDetails.pointsCount > 0
                     ? (
-                        eventDetails.event.totalPointsToScore /
-                        eventDetails.pointsCount
+                        (eventDetails.pointsCount /
+                          eventDetails.event.totalPointsToScore) *
+                        100
                       ).toFixed(2)
                     : 0}
                   %
