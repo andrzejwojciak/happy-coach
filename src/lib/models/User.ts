@@ -7,4 +7,8 @@ export type User = {
   lastLoginDate?: Date;
   isAdmin?: boolean;
   dataFetched: boolean;
+  image_72?: string;
+  image_48?: string;
+  image_32?: string;
+  image_24?: string;
 };

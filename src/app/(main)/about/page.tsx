@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/alt-text */
+/* eslint-disable @next/next/no-img-element */
 /* eslint-disable react/no-unescaped-entities */
 import Image from "next/image";
 
@@ -11,9 +13,11 @@ export default function About() {
         width={300}
         height={300}
       />
-      src="/images/happy-coach-logo-black.png"
+      img src="/images/happy-coach-logo-black.png"
+      <img src="/images/happy-coach-logo-black.png" />
+      src="/public/images/happy-coach-logo-black.png"
       <Image
-        src="/images/happy-coach-logo-black.png"
+        src="/public/images/happy-coach-logo-black.png"
         alt="HappyCoach logo"
         width={300}
         height={300}

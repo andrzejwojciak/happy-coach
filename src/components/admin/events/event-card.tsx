@@ -104,13 +104,13 @@ export default async function EventCard({
               <div>
                 <div className="font-medium mb-2">Hours gained</div>
                 <div className="font-bold text-2xl">
-                  {eventDetails.hoursCount}
+                  {eventDetails.hoursCount.toFixed(2)}
                 </div>
               </div>
               <div>
                 <div className="font-medium mb-2">Kilometers gained</div>
                 <div className="font-bold text-2xl">
-                  {eventDetails.kilometersCount}
+                  {eventDetails.kilometersCount.toFixed(2)}
                 </div>
               </div>
             </div>
@@ -182,7 +182,9 @@ export default async function EventCard({
                       .map(
                         (participant) =>
                           `${
-                            participant.fullName
+                            participant.fullName ??
+                            participant.email ??
+                            "Unknown"
                           } - ${participant.pointsCount.toFixed(2)} points`
                       )
                       .join("\n")}
@@ -220,6 +222,7 @@ export default async function EventCard({
             <div className="overflow-y-auto max-h-60">
               {eventDetails.participants
                 .sort((a, b) => b.pointsCount - a.pointsCount)
+                .slice(0, 5)
                 .map((participant) => {
                   return (
                     <div
@@ -251,6 +254,7 @@ export default async function EventCard({
             <div className="overflow-y-auto max-h-60">
               {eventDetails.participants
                 .sort((a, b) => b.kilometersCount - a.kilometersCount)
+                .slice(0, 5)
                 .map((participant) => {
                   return (
                     <div
@@ -283,6 +287,7 @@ export default async function EventCard({
             <div className="overflow-y-auto max-h-60">
               {eventDetails.participants
                 .sort((a, b) => b.hoursCount - a.hoursCount)
+                .slice(0, 5)
                 .map((participant) => {
                   return (
                     <div
@@ -314,6 +319,7 @@ export default async function EventCard({
             <div className="overflow-y-auto max-h-60">
               {eventDetails.participants
                 .sort((a, b) => b.entiresCount - a.entiresCount)
+                .slice(0, 5)
                 .map((participant) => {
                   return (
                     <div

@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/alt-text */
+/* eslint-disable @next/next/no-img-element */
 import NavLinks from "@/src/components/layout/nav-links";
 import Link from "next/link";
 import Image from "next/image";
@@ -17,9 +19,8 @@ export default async function Navbar() {
       <div className="w-900 flex flex-row justify-between">
         <div>
           <Link href="/">
-            <Image
-              src="https://i.imgur.com/HpCMeLx.png"
-              alt="HappyCoach logo"
+            <img
+              src="/images/happy-coach-logo-black.png"
               width={110}
               height={68.5}
             />

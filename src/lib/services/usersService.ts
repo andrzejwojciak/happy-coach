@@ -117,6 +117,10 @@ export async function setIsAdmin(
   return updated !== null;
 }
 
+function isNullOrEmpty(value: string | null | undefined): boolean {
+  return value === null || value === undefined || value === "";
+}
+
 export async function getSynchronizedUserData(
   userId: string
 ): Promise<User | null> {
@@ -126,7 +130,15 @@ export async function getSynchronizedUserData(
 
   if (!fetchedUser.ok) return null;
 
-  console.log(fetchedUser);
+  const displayName = !isNullOrEmpty(fetchedUser.user?.profile?.display_name)
+    ? fetchedUser.user?.profile?.display_name
+    : !isNullOrEmpty(fetchedUser.user?.profile?.display_name)
+    ? fetchedUser.user?.profile?.display_name
+    : !isNullOrEmpty(fetchedUser.user?.profile?.real_name)
+    ? fetchedUser.user?.profile?.real_name
+    : !isNullOrEmpty(fetchedUser.user?.name)
+    ? fetchedUser.user?.name
+    : fetchedUser.user?.profile?.email;
 
   const updatedUser = await prismaClient.user.update({
     where: {
@@ -134,11 +146,7 @@ export async function getSynchronizedUserData(
     },
     data: {
       email: fetchedUser.user?.profile?.email,
-      display_name:
-        fetchedUser.user?.profile?.display_name ??
-        fetchedUser.user?.profile?.real_name ??
-        fetchedUser.user?.name ??
-        fetchedUser.user?.profile?.email,
+      display_name: displayName,
       image_24: fetchedUser.user?.profile?.image_24,
       image_32: fetchedUser.user?.profile?.image_32,
       image_48: fetchedUser.user?.profile?.image_48,
@@ -169,23 +177,21 @@ async function isPasswordMatching(
 }
 
 export async function synchronizeUserData(id: string) {
-  const fetchedUser = await slackApp.client.users.info({
-    user: id,
-  });
+  const fetchedUser = await getSynchronizedUserData(id);
 
-  if (!fetchedUser.ok) return;
+  if (!fetchedUser) return;
 
   await prismaClient.user.update({
     where: {
       id: id,
     },
     data: {
-      email: fetchedUser.user?.profile?.email,
-      display_name: fetchedUser.user?.profile?.display_name,
-      image_24: fetchedUser.user?.profile?.image_24,
-      image_32: fetchedUser.user?.profile?.image_32,
-      image_48: fetchedUser.user?.profile?.image_48,
-      image_72: fetchedUser.user?.profile?.image_72,
+      email: fetchedUser.email,
+      display_name: fetchedUser.displayName,
+      image_24: fetchedUser.image_24,
+      image_32: fetchedUser.image_32,
+      image_48: fetchedUser.image_48,
+      image_72: fetchedUser.image_72,
       dataFetched: true,
     },
   });
