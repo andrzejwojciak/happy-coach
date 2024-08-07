@@ -98,7 +98,7 @@ export default async function EventCard({
               <div>
                 <div className="font-medium mb-2">Points scored</div>
                 <div className="font-bold text-2xl">
-                  {eventDetails.pointsCount}
+                  {eventDetails.pointsCount.toFixed(0)}
                 </div>
               </div>
               <div>

@@ -1,3 +1,5 @@
+import { Theme } from "@/src/lib/types/Theme";
+
 export type Event = {
   id: number;
   channelId: string;
@@ -10,11 +12,4 @@ export type Event = {
   totalPointsToScore: number;
   finished: boolean;
   theme: Theme | null;
-};
-
-export type Theme = {
-  startSign: string;
-  stopSign: string;
-  pawn: string;
-  themeName: string;
 };

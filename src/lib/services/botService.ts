@@ -1,7 +1,7 @@
-import BasicCommandsHandler from "@/src/bot/handlers/basicCommandsHandler";
-import EventCommandHandler from "@/src/bot/handlers/eventCommandHandler";
-import NoEventCommandHandler from "@/src/bot/handlers/noEventCommandHandler";
-import { Message } from "@/src/bot/types/message";
+import BasicCommandsHandler from "@/src/lib/handlers/basicCommandsHandler";
+import EventCommandHandler from "@/src/lib/handlers/eventCommandHandler";
+import NoEventCommandHandler from "@/src/lib/handlers/noEventCommandHandler";
+import { Message } from "@/src/lib/types/slack/message";
 import { App } from "@slack/bolt";
 import { getCache, saveCache } from "@/src/lib/cache/cacheService";
 

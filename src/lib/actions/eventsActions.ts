@@ -14,7 +14,7 @@ import {
 } from "@/src/lib/services/eventsService";
 import { createTheme } from "@/src/lib/services/themeService";
 import { Result } from "@/src/lib/types/Result";
-import { slackApp } from "@/src/bot/bot";
+import { slackApp } from "@/src/lib/services/botService";
 import { getCurrentUser } from "./sessionActions";
 import { redirect } from "next/navigation";
 

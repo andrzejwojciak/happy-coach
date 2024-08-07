@@ -1,4 +1,4 @@
-import { slackApp } from "@/src/bot/bot";
+import { slackApp } from "@/src/lib/services/botService";
 import { prismaClient } from "@/src/lib/data/client";
 import { User } from "@/src/lib/models/User";
 import {

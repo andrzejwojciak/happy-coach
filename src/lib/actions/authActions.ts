@@ -1,6 +1,6 @@
 "use server";
 
-import { slackApp } from "@/src/bot/bot";
+import { slackApp } from "@/src/lib/services/botService";
 import {
   createUser,
   getUserByCredentials,

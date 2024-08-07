@@ -283,3 +283,147 @@ ORDER BY
         : 0,
   };
 }
+
+// copied from legacy code
+
+import {
+  GetEventAsync as GetEventAsyncRepositoryMethod,
+  GetTotalScore as GetTotalScoreRepositoryMethod,
+  saveRecordAsync as saveRecordAsyncRepositoryMethod,
+} from "@/src/lib/repositories/repository";
+import { Event as EventType } from "@/src/lib/types/Event";
+import { Unit } from "@/src/lib/types/enums/Unit";
+import { ResultItem } from "@/src/lib/types/ResultItemModel";
+import { getNumbersFromMessage } from "@/src/lib/services/recordService";
+
+export async function GetEventAsync(
+  channelId: string
+): Promise<EventType | null> {
+  const event = await GetEventAsyncRepositoryMethod(channelId);
+  return event as EventType;
+}
+
+export async function addRecordsAsync(
+  logMessage: string,
+  message: string,
+  userId: string,
+  event: EventType
+): Promise<string> {
+  const distances = getNumbersFromMessage(message, Unit.Kilometer);
+  const hours = getNumbersFromMessage(message, Unit.Hour);
+
+  getNumbersFromMessage(message, Unit.Minute).forEach((minute) =>
+    hours.push(minute / 60)
+  );
+
+  let responseMessage: string = "";
+
+  if (hours.length) {
+    await saveRecordAsyncRepositoryMethod(
+      userId,
+      logMessage,
+      Unit.Time,
+      hours,
+      event.id
+    );
+
+    responseMessage += prepareMessage(hours, Unit.Time, event.pointsForHour);
+  }
+
+  if (distances.length) {
+    await saveRecordAsyncRepositoryMethod(
+      userId,
+      logMessage,
+      Unit.Distance,
+      distances,
+      event.id
+    );
+
+    responseMessage += prepareMessage(
+      distances,
+      Unit.Distance,
+      event.pointsForKilometre
+    );
+  }
+
+  const pointsScored: number = await getTotalScore(event);
+
+  if (pointsScored >= event.totalPointsToScore) {
+    responseMessage = `Congratulations on completing the ${event.eventName} event! You scored ${pointsScored} points before the time ran out. Great job!`;
+    await finishEvent(event.id);
+  } else {
+    if (event.themeId) {
+      const percentScored = (pointsScored / event.totalPointsToScore) * 100;
+
+      const fieldChar = "–";
+      const totalFieldsToJump = 20;
+
+      let fieldsJumped = Math.trunc((percentScored / 100) * totalFieldsToJump);
+      let fieldsToJump = totalFieldsToJump - fieldsJumped - 1;
+
+      let progressBar =
+        fieldChar.repeat(fieldsJumped) +
+        event.theme?.pawn +
+        fieldChar.repeat(fieldsToJump);
+
+      responseMessage += `\n${event.theme?.startSign}${progressBar}${
+        event.theme?.stopSign
+      } (${percentScored.toFixed(2)}%)`;
+      responseMessage += `\n${pointsScored}/${event.totalPointsToScore} points`;
+    } else {
+      responseMessage += `\ntotal score:  ${pointsScored}/${event.totalPointsToScore} points`;
+    }
+  }
+
+  return responseMessage;
+}
+
+export async function getTotalScore(event: EventType): Promise<number> {
+  const result = await GetTotalScoreRepositoryMethod(event.id);
+
+  const distanceSum =
+    result.find((row: ResultItem) => row.activity === "distance")?.sum || 0;
+
+  const timeSum =
+    result.find((row: ResultItem) => row.activity === "time")?.sum || 0;
+
+  const totalPoints = (
+    distanceSum * event.pointsForKilometre +
+    timeSum * event.pointsForHour
+  ).toFixed(0);
+
+  return Number(totalPoints);
+}
+
+export function prepareMessage(
+  newRecords: number[],
+  unit: string,
+  pointsForUnit: number
+): string {
+  let message = "";
+
+  if (newRecords.length === 1) {
+    return (message += `you scored ${(newRecords[0] * pointsForUnit).toFixed(
+      0
+    )} points for ${unit}\n`);
+  }
+
+  let currentSum = 0;
+  let isFirstNumber = true;
+
+  newRecords.forEach((record: number) => {
+    currentSum += record;
+    if (isFirstNumber) {
+      message += (record * pointsForUnit).toFixed(0);
+      isFirstNumber = false;
+    } else {
+      message += " + " + (record * pointsForUnit).toFixed(0);
+    }
+  });
+
+  message += ` = ${(currentSum * pointsForUnit).toFixed(
+    0
+  )} points for ${unit}\n`;
+
+  return message;
+}

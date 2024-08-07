@@ -1,5 +1,5 @@
-import { Message } from "@/src/bot/types/message";
-import { HandleResult } from "@/src/bot/types/handleResult";
+import { Message } from "@/src/lib/types/slack/message";
+import { HandleResult } from "@/src/lib/types/slack/handleResult";
 
 export interface Handler {
   setNext(handler: Handler): Handler;

@@ -1,6 +1,6 @@
-import { Message } from "@/src/bot/types/message";
-import { HandleResult } from "@/src/bot/types/handleResult";
-import { AbstractHandler } from "@/src/bot/handlers/handler";
+import { Message } from "@/src/lib/types/slack/message";
+import { HandleResult } from "@/src/lib/types/slack/handleResult";
+import { AbstractHandler } from "@/src/lib/handlers/handler";
 
 export default class BasicCommandsHandler extends AbstractHandler {
   public async handle(request: Message): Promise<HandleResult | null> {

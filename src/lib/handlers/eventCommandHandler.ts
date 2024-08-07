@@ -1,19 +1,19 @@
 import moment from "moment";
-import { AbstractHandler } from "@/src/bot/handlers/handler";
-import { EventService } from "@/src/bot/services/eventService";
-import { Message } from "@/src/bot/types/message";
-import { HandleResult } from "@/src/bot/types/handleResult";
-import { CreateEventDetails } from "@/src/bot/services/models/createEventModel";
-import { Event } from "@/src/bot/services/models/Event";
+import { AbstractHandler } from "@/src/lib/handlers/handler";
+import { Message } from "@/src/lib/types/slack/message";
+import { HandleResult } from "@/src/lib/types/slack/handleResult";
+import { Event } from "@/src/lib/types/Event";
 import { getOrCreateUserById } from "@/src/lib/services/usersService";
+import {
+  addRecordsAsync,
+  GetEventAsync,
+} from "@/src/lib/services/eventsService";
 
 export default class EventCommandHandler extends AbstractHandler {
-  private eventService!: EventService;
   private event!: Event;
 
   public async handle(request: Message): Promise<HandleResult | null> {
-    this.eventService = new EventService();
-    const event = await this.eventService.GetEventAsync(request.channel);
+    const event = await GetEventAsync(request.channel);
 
     if (!event) {
       console.log("no event found for channel " + request.channel);
@@ -41,7 +41,7 @@ export default class EventCommandHandler extends AbstractHandler {
   ): Promise<HandleResult | null> {
     const user = await getOrCreateUserById(request.user);
 
-    const result = await this.eventService.addRecordsAsync(
+    const result = await addRecordsAsync(
       JSON.stringify(request),
       request.text,
       user.id,

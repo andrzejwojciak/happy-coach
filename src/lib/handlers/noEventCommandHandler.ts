@@ -1,8 +1,13 @@
-import { AbstractHandler } from "@/src/bot/handlers/handler";
-import { HandleResult } from "@/src/bot/types/handleResult";
-import { Message } from "@/src/bot/types/message";
-import { RecordService } from "@/src/bot/services/recordService";
+import { AbstractHandler } from "@/src/lib/handlers/handler";
+import { HandleResult } from "@/src/lib/types/slack/handleResult";
+import { Message } from "@/src/lib/types/slack/message";
 import { getOrCreateUserById } from "@/src/lib/services/usersService";
+import {
+  addRecords,
+  getCurrentValues,
+  getUsersRecord,
+  getUsersRecordByYear,
+} from "@/src/lib/services/recordService";
 
 export default class NoEventCommandHandler extends AbstractHandler {
   public async handle(request: Message): Promise<HandleResult | null> {
@@ -29,11 +34,9 @@ export default class NoEventCommandHandler extends AbstractHandler {
   }
 
   private async addEntires(request: Message): Promise<HandleResult | null> {
-    const recordService = new RecordService();
-
     await getOrCreateUserById(request.user);
 
-    const result = await recordService.addRecords(
+    const result = await addRecords(
       JSON.stringify(request),
       request.text,
       request.user
@@ -50,12 +53,11 @@ export default class NoEventCommandHandler extends AbstractHandler {
     request: Message
   ): Promise<HandleResult | null> {
     if (request.thread_ts) return null;
-    const recordService = new RecordService();
 
     const year = request.text.match(/[2-9][0-9]{3}/);
     const activity = request.text.match(/(distance|time)/);
 
-    const usersRecords = await recordService.getUsersRecordByYear(
+    const usersRecords = await getUsersRecordByYear(
       Number(year![0]),
       activity![0]
     );
@@ -71,11 +73,10 @@ export default class NoEventCommandHandler extends AbstractHandler {
     request: Message
   ): Promise<HandleResult | null> {
     if (request.thread_ts) return null;
-    const recordService = new RecordService();
 
     const activity = request.text.match(/(distance|time)/);
 
-    const usersRecords = await recordService.getUsersRecord(activity![0]);
+    const usersRecords = await getUsersRecord(activity![0]);
     const replyMessage = usersRecords ? usersRecords : "nothing here";
 
     return {
@@ -85,9 +86,8 @@ export default class NoEventCommandHandler extends AbstractHandler {
 
   private async checkStats(request: Message): Promise<HandleResult | null> {
     if (request.thread_ts) return null;
-    const recordService = new RecordService();
-    const timeValues = await recordService.getCurrentValues("time");
-    const distanceValue = await recordService.getCurrentValues("distance");
+    const timeValues = await getCurrentValues("time");
+    const distanceValue = await getCurrentValues("distance");
 
     return {
       text: `Time: ${timeValues}, distance: ${distanceValue}`,

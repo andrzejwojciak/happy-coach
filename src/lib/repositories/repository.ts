@@ -1,8 +1,8 @@
 // TEMPORARY
 
-import { ResultItem } from "@/src/bot/services/models/resultItemModel";
+import { ResultItem } from "@/src/lib/types/ResultItemModel";
 import { prismaClient } from "@/src/lib/data/client";
-import { Event } from "@/src/bot/services/models/Event";
+import { Event } from "@/src/lib/types/Event";
 
 export const GetEventAsync = async (
   channelId: string

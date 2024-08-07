@@ -1,6 +1,6 @@
 "use server";
 
-import { startBot, stopBot, botStatus } from "@/src/bot/bot";
+import { startBot, stopBot, botStatus } from "@/src/lib/services/botService";
 
 export async function getBotStatusAction(): Promise<boolean> {
   return botStatus();
