@@ -1,29 +1,33 @@
-version: '3'
+version: "3"
 services:
   happy_coach:
     container_name: happy_coach
     ports:
-      - '3000:3000'
+      - "${APP_PORT}:3000"
     restart: always
     build: .
     depends_on:
       - db
+    networks:
+      - mynetwork
 
   db:
     container_name: postgres
     image: postgres:15-alpine
     ports:
-      - '${DB_PORT}:5432'
+      - "${DB_PORT}:5432"
     volumes:
-      - data:/data/db
+      - postgres_data:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=${DB_USERNAME}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_DBNAME}
+    networks:
+      - mynetwork
 
 networks:
   mynetwork:
     driver: bridge
 
 volumes:
-  data: {}
+  postgres_data:
