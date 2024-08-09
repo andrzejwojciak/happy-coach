@@ -14,18 +14,6 @@ const nextConfig = {
         port: "",
         pathname: "/**",
       },
-      {
-        protocol: "https",
-        hostname: "i.imgur.com",
-        port: "",
-        pathname: "/**",
-      },
-      {
-        protocol: "http",
-        hostname: "vps427257.ovh.net",
-        port: "3000",
-        pathname: "/**",
-      },
     ],
   },
 };
