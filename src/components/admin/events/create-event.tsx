@@ -69,7 +69,10 @@ export default function CreateEvent() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    createEventAction(eventFormData, undefined).then((response) => {
+    createEventAction(
+      eventFormData,
+      themeCreateMode ? themeFormData : undefined
+    ).then((response) => {
       if (response && !response.success) setErrors(response.errorMessage);
     });
   };
